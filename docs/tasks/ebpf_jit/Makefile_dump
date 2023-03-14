@@ -1,0 +1,25 @@
+INSDIR  := /tools/arc-linux-gnu
+
+TEST    := dump
+
+AS      := $(INSDIR)/bin/arc-linux-gnu-as
+LD      := $(INSDIR)/bin/arc-linux-gnu-ld
+OBJDUMP := $(INSDIR)/bin/arc-linux-gnu-objdump
+
+build: $(TEST)
+
+$(TEST): $(TEST).s
+	$(AS) -mcpu=archs -g3 $^ -o $(^:.s=.o)
+	$(LD) $(^:.s=.o) -o $@
+
+.PHONY: linux gdb debug dis clean
+
+dis:
+	$(OBJDUMP) --visualize-jumps=color --disassembler-options="cpu=hs38_linux" -d $(TEST)
+
+fetch:
+	rsync arc:/var/log/messages ./jit.trace
+
+clean:
+	$(RM) $(TEST) *.o *.sym  gdbinit
+

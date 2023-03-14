@@ -1,0 +1,3 @@
+files starting with 'S*' are automatically started by /etc/init.d/rcS
+therefore the proposed file is saved as 'disabled.S50sshd'. Change it
+to 'S50sshd' in case you want it in motion.
