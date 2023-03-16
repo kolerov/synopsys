@@ -1,0 +1,576 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>🟡 Checking JIT for eBPF &#8212; Kolerov&#39;s Notes 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="🟡 glibc testsuite fails with vanilla Linux kernels" href="../glibc_mmu_bug.html" />
+    <link rel="prev" title="Tasks" href="../index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../glibc_mmu_bug.html" title="🟡 glibc testsuite fails with vanilla Linux kernels"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="Tasks"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Kolerov&#39;s Notes 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Tasks</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">🟡 Checking JIT for eBPF</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="checking-jit-for-ebpf">
+<h1>🟡 Checking JIT for eBPF<a class="headerlink" href="#checking-jit-for-ebpf" title="Permalink to this heading">¶</a></h1>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#build-and-install-elfutils" id="id5">Build and install elfutils</a></p></li>
+<li><p><a class="reference internal" href="#build-and-install-pahole" id="id6">Build and install Pahole</a></p></li>
+<li><p><a class="reference internal" href="#generate-and-setup-openssh-keys" id="id7">Generate and setup OpenSSH keys</a></p></li>
+<li><p><a class="reference internal" href="#building-rootfs-cpio" id="id8">Building <code class="docutils literal notranslate"><span class="pre">rootfs.cpio</span></code></a></p></li>
+<li><p><a class="reference internal" href="#building-a-linux-kernel" id="id9">Building a Linux kernel</a></p></li>
+<li><p><a class="reference internal" href="#booting" id="id10">Booting</a></p></li>
+<li><p><a class="reference internal" href="#run-ebpf-tests" id="id11">Run eBPF tests</a></p></li>
+<li><p><a class="reference internal" href="#analyzing-dumps" id="id12">Analyzing dumps</a></p></li>
+<li><p><a class="reference internal" href="#build-a-simple-bpf-application" id="id13">Build a simple BPF application</a></p></li>
+</ul>
+</nav>
+<section id="build-and-install-elfutils">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Build and install elfutils</a><a class="headerlink" href="#build-and-install-elfutils" title="Permalink to this heading">¶</a></h2>
+<p>Build elfutils (use your own path for prefix):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>elfutils-0.189<span class="w"> </span>https://sourceware.org/git/elfutils.git
+<span class="nb">cd</span><span class="w"> </span>elfutils
+autoreconf<span class="w"> </span>-fi
+./configure<span class="w"> </span>--prefix<span class="o">=</span>/tools/elfutils<span class="w"> </span>--enable-maintainer-mode
+make<span class="w"> </span>-j<span class="w"> </span><span class="k">$(</span>nproc<span class="k">)</span>
+make<span class="w"> </span>install
+</pre></div>
+</div>
+<p>Configure your environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span>/tools/elfutils/bin:<span class="nv">$PATH</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span>/tools/elfutils/lib<span class="si">${</span><span class="nv">LD_LIBRARY_PATH</span><span class="p">:+:</span><span class="nv">$LD_LIBRARY_PATH</span><span class="si">}</span>
+</pre></div>
+</div>
+</section>
+<section id="build-and-install-pahole">
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">Build and install Pahole</a><a class="headerlink" href="#build-and-install-pahole" title="Permalink to this heading">¶</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>We use here 1.23 version of Pahole because of this commit in the latest version:</p>
+<blockquote>
+<div><p><a class="reference external" href="https://git.kernel.org/pub/scm/devel/pahole/pahole.git/commit/?id=9712d9ec929fb6b3595d2970bbbac8b0b1c10ead">https://git.kernel.org/pub/scm/devel/pahole/pahole.git/commit/?id=9712d9ec929fb6b3595d2970bbbac8b0b1c10ead</a></p>
+</div></blockquote>
+<p>It leads to generating BTF information for 64-bit enumerations. However, Linux kernels below 6.0 version
+contain tools which don’t support such BTF structures and crash while building the kernel.</p>
+</div>
+<p>Build Pahole (use your own path for prefix):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>v1.23<span class="w"> </span>https://git.kernel.org/pub/scm/devel/pahole/pahole.git
+mkdir<span class="w"> </span>pahole/build
+<span class="nb">cd</span><span class="w"> </span>pahole/build
+cmake<span class="w"> </span>-D__LIB<span class="o">=</span>lib<span class="w"> </span>-DCMAKE_INSTALL_PREFIX<span class="o">=</span>/tools/pahole<span class="w"> </span>..
+make<span class="w"> </span>install
+</pre></div>
+</div>
+<p>Configure your environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span>/tools/pahole/bin:<span class="nv">$PATH</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span>/tools/pahole/lib<span class="si">${</span><span class="nv">LD_LIBRARY_PATH</span><span class="p">:+:</span><span class="nv">$LD_LIBRARY_PATH</span><span class="si">}</span>
+</pre></div>
+</div>
+</section>
+<section id="generate-and-setup-openssh-keys">
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">Generate and setup OpenSSH keys</a><a class="headerlink" href="#generate-and-setup-openssh-keys" title="Permalink to this heading">¶</a></h2>
+<p>Generate keys (use your own home path):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mkdir ~/.ssh/keys
+$ ssh-keygen -t rsa -C &quot;ebpf@jit&quot;
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/ykolerov/.ssh/id_rsa): /home/ykolerov/.ssh/keys/arc
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in /home/ykolerov/.ssh/keys/arc
+Your public key has been saved in /home/ykolerov/.ssh/keys/arc.pub
+</pre></div>
+</div>
+<p>Configure your SSH hosts in <code class="docutils literal notranslate"><span class="pre">~/.ssh/config</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Host</span> <span class="n">arc</span>
+    <span class="n">HostName</span>            <span class="mf">127.0.0.1</span>
+    <span class="n">Port</span>                <span class="mi">2022</span>
+    <span class="n">User</span>                <span class="n">root</span>
+    <span class="n">IdentityFile</span>        <span class="o">~/.</span><span class="n">ssh</span><span class="o">/</span><span class="n">keys</span><span class="o">/</span><span class="n">arc</span>
+</pre></div>
+</div>
+</section>
+<section id="building-rootfs-cpio">
+<h2><a class="toc-backref" href="#id8" role="doc-backlink">Building <code class="docutils literal notranslate"><span class="pre">rootfs.cpio</span></code></a><a class="headerlink" href="#building-rootfs-cpio" title="Permalink to this heading">¶</a></h2>
+<p>Clone Buildroot from upstream repository and create a build directory:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://git.buildroot.net/buildroot
+mkdir<span class="w"> </span>buildroot/build
+<span class="nb">cd</span><span class="w"> </span>buildroot/build
+</pre></div>
+</div>
+<p>Create <code class="docutils literal notranslate"><span class="pre">busybox.fragment</span></code> file for Busybox:</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">busybox.fragment</span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>CONFIG_FEATURE_PIDFILE=y
+CONFIG_PID_FILE_PATH=&quot;/var/run&quot;
+CONFIG_DEBUG=y
+CONFIG_DEBUG_PESSIMIZE=y
+CONFIG_FTPD=y
+CONFIG_FEATURE_FTPD_WRITE=y
+CONFIG_FEATURE_FTPD_ACCEPT_BROKEN_LIST=y
+CONFIG_FEATURE_FTPD_AUTHENTICATION=y
+CONFIG_NC=y
+CONFIG_NETCAT=y
+CONFIG_NC_SERVER=y
+CONFIG_NC_EXTRA=y
+CONFIG_NC_110_COMPAT=y
+CONFIG_TELNETD=y
+CONFIG_FEATURE_TELNETD_STANDALONE=y
+CONFIG_FEATURE_TELNETD_PORT_DEFAULT=23
+CONFIG_FEATURE_TELNETD_INETD_WAIT=y
+</pre></div>
+</div>
+</div>
+<p>Create <code class="docutils literal notranslate"><span class="pre">device_table.txt</span></code> for custom device table.</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">device_table.txt</span><a class="headerlink" href="#id2" title="Permalink to this code">¶</a></div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span># See package/makedevs/README for details
+#
+# This device table is used to assign proper ownership and permissions
+# on various files. It doesn&#39;t create any device file, as it is used
+# in both static device configurations (where /dev/ is static) and in
+# dynamic configurations (where devtmpfs, mdev or udev are used).
+#
+# &lt;name&gt;                                &lt;type&gt;  &lt;mode&gt;  &lt;uid&gt;   &lt;gid&gt;   &lt;major&gt; &lt;minor&gt; &lt;start&gt; &lt;inc&gt;   &lt;count&gt;
+/dev                                    d       755     0       0       -       -       -       -       -
+/tmp                                    d       1777    0       0       -       -       -       -       -
+/etc                                    d       755     0       0       -       -       -       -       -
+/root                                   d       700     0       0       -       -       -       -       -
+/var/www                                d       755     33      33      -       -       -       -       -
+/etc/shadow                             f       600     0       0       -       -       -       -       -
+/etc/passwd                             f       644     0       0       -       -       -       -       -
+/etc/network/if-up.d                    d       755     0       0       -       -       -       -       -
+/etc/network/if-pre-up.d                d       755     0       0       -       -       -       -       -
+/etc/network/if-down.d                  d       755     0       0       -       -       -       -       -
+/etc/network/if-post-down.d             d       755     0       0       -       -       -       -       -
+# shahab&#39;s changes
+/etc/dropbear/dropbear_rsa_host_key     f       400     0       0       -       -       -       -       -
+/etc/dropbear/dropbear_ed25519_host_key f       400     0       0       -       -       -       -       -
+/etc/profile.d/home-root.sh             f       755     0       0       -       -       -       -       -
+/usr/bin/server                         f       755     0       0       -       -       -       -       -
+# uncomment this to allow starting x as non-root
+#/usr/X11R6/bin/Xfbdev                  f       4755    0       0       -       -       -       -       -
+</pre></div>
+</div>
+</div>
+<p>Copy <code class="docutils literal notranslate"><span class="pre">overlay</span></code> directory from the repository:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>cp -r &lt;docs-repository&gt;/tasks/ebpf_jit/overlay .
+</pre></div>
+</div>
+<p>Add your public key to the overlay directory:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>overlay/root/.ssh
+cp<span class="w"> </span>~/.ssh/keys/arc.pub<span class="w"> </span>overlay/root/.ssh/authorized_keys
+</pre></div>
+</div>
+<p>Save this configuration as <code class="docutils literal notranslate"><span class="pre">ebpf_defconfig</span></code>:</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">ebpf_defconfig</span><a class="headerlink" href="#id3" title="Permalink to this code">¶</a></div>
+<div class="highlight-linuxconfig notranslate"><div class="highlight"><pre><span></span>BR2_arcle<span class="s">=y</span>
+BR2_archs38<span class="s">=y</span>
+BR2_TOOLCHAIN_EXTERNAL<span class="s">=y</span>
+BR2_TOOLCHAIN_EXTERNAL_CUSTOM<span class="s">=y</span>
+BR2_TOOLCHAIN_EXTERNAL_PATH<span class="s">=&quot;/tools/arc-linux-gnu&quot;</span>
+BR2_TOOLCHAIN_EXTERNAL_CUSTOM_PREFIX<span class="s">=&quot;$(ARCH)-linux-gnu&quot;</span>
+BR2_TOOLCHAIN_EXTERNAL_HEADERS_5_16<span class="s">=y</span>
+BR2_TOOLCHAIN_EXTERNAL_CUSTOM_GLIBC<span class="s">=y</span>
+BR2_TOOLCHAIN_EXTERNAL_INET_RPC<span class="s">=n</span>
+BR2_TOOLCHAIN_EXTERNAL_CXX<span class="s">=y</span>
+BR2_TOOLCHAIN_EXTERNAL_GDB_SERVER_COPY<span class="s">=y</span>
+BR2_ENABLE_DEBUG<span class="s">=y</span>
+BR2_DEBUG_3<span class="s">=y</span>
+BR2_OPTIMIZE_G<span class="s">=y</span>
+BR2_TARGET_GENERIC_HOSTNAME<span class="s">=&quot;archs&quot;</span>
+BR2_ROOTFS_DEVICE_TABLE<span class="s">=&quot;build/device_table.txt&quot;</span>
+BR2_SYSTEM_DHCP<span class="s">=&quot;eth0&quot;</span>
+BR2_ROOTFS_OVERLAY<span class="s">=&quot;build/overlay&quot;</span>
+BR2_PACKAGE_BUSYBOX_CONFIG_FRAGMENT_FILES<span class="s">=&quot;build/busybox.fragment&quot;</span>
+BR2_PACKAGE_NCURSES<span class="s">=y</span>
+BR2_PACKAGE_NCURSES_WCHAR<span class="s">=y</span>
+BR2_PACKAGE_HAVEGED<span class="s">=y</span>
+BR2_PACKAGE_DROPBEAR<span class="s">=y</span>
+BR2_PACKAGE_DROPBEAR_DISABLE_REVERSEDNS<span class="s">=y</span>
+BR2_PACKAGE_RSYNC<span class="s">=y</span>
+BR2_TARGET_ROOTFS_CPIO<span class="s">=y</span>
+BR2_PACKAGE_HOST_KMOD<span class="s">=y</span>
+BR2_PACKAGE_LIBBPF<span class="s">=y</span>
+BR2_PACKAGE_BPFTOOL<span class="s">=y</span>
+BR2_PACKAGE_ELFUTILS<span class="s">=y</span>
+</pre></div>
+</div>
+</div>
+<p>Build a Buildroot configuration file and the build <code class="docutils literal notranslate"><span class="pre">rootfs.cpio</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>-C<span class="w"> </span>..<span class="w"> </span><span class="nv">O</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="w"> </span>defconfig<span class="w"> </span><span class="nv">BR2_DEFCONFIG</span><span class="o">=</span>build/ebpf_defconfig
+make<span class="w"> </span>-j<span class="w"> </span><span class="k">$(</span>nproc<span class="k">)</span>
+</pre></div>
+</div>
+</section>
+<section id="building-a-linux-kernel">
+<h2><a class="toc-backref" href="#id9" role="doc-backlink">Building a Linux kernel</a><a class="headerlink" href="#building-a-linux-kernel" title="Permalink to this heading">¶</a></h2>
+<p>Retrieve sources of the Linux kernel with latest changes for eBPF JIT:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>shahab-bpf-jit<span class="w"> </span>https://github.com/foss-for-synopsys-dwc-arc-processors/linux
+mkdir<span class="w"> </span>linux/build
+<span class="nb">cd</span><span class="w"> </span>linux/build
+</pre></div>
+</div>
+<p>Change <code class="docutils literal notranslate"><span class="pre">kernel/bpf/Makefile</span></code> to prevent some build errors:</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gh">diff --git a/kernel/bpf/Makefile b/kernel/bpf/Makefile</span>
+<span class="gh">index ae90af5b0425..4699a022079a 100644</span>
+<span class="gd">--- a/kernel/bpf/Makefile</span>
+<span class="gi">+++ b/kernel/bpf/Makefile</span>
+<span class="gu">@@ -4,7 +4,7 @@ ifneq ($(CONFIG_BPF_JIT_ALWAYS_ON),y)</span>
+<span class="w"># ___bpf_prog_run() needs GCSE disabled on x86; see 3193c0836f203 for details</span>
+<span class="w">cflags-nogcse-$(CONFIG_X86)$(CONFIG_CC_IS_GCC) := -fno-gcse</span>
+<span class="w">endif</span>
+<span class="gd">-CFLAGS_core.o += $(call cc-disable-warning, override-init) $(cflags-nogcse-yy) -Og -g3</span>
+<span class="gi">+CFLAGS_core.o += $(call cc-disable-warning, override-init) $(cflags-nogcse-yy) -Og -g3 -finline-functions-called-once</span>
+</pre></div>
+</div>
+<p>Save this configuration (user your own path to <code class="docutils literal notranslate"><span class="pre">.cpio</span></code> file) to <code class="docutils literal notranslate"><span class="pre">arch/arc/configs/ebpf_jit_defconfig</span></code>:</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">ebpf_jit_defconfig</span><a class="headerlink" href="#id4" title="Permalink to this code">¶</a></div>
+<div class="highlight-linuxconfig notranslate"><div class="highlight"><pre><span></span><span class="c"># CONFIG_SWAP is not set</span>
+CONFIG_SYSVIPC<span class="s">=y</span>
+CONFIG_POSIX_MQUEUE<span class="s">=y</span>
+<span class="c"># CONFIG_CROSS_MEMORY_ATTACH is not set</span>
+CONFIG_NO_HZ_IDLE<span class="s">=y</span>
+CONFIG_HIGH_RES_TIMERS<span class="s">=y</span>
+CONFIG_BPF_SYSCALL<span class="s">=y</span>
+CONFIG_BPF_JIT<span class="s">=y</span>
+<span class="c"># CONFIG_BPF_UNPRIV_DEFAULT_OFF is not set</span>
+CONFIG_PREEMPT<span class="s">=y</span>
+CONFIG_IKCONFIG<span class="s">=y</span>
+CONFIG_IKCONFIG_PROC<span class="s">=y</span>
+CONFIG_NAMESPACES<span class="s">=y</span>
+<span class="c"># CONFIG_UTS_NS is not set</span>
+<span class="c"># CONFIG_PID_NS is not set</span>
+CONFIG_INITRAMFS_SOURCE<span class="s">=&quot;../buildroot/build/images/rootfs.cpio&quot;</span>
+CONFIG_ARC_BUILTIN_DTB_NAME<span class="s">=&quot;haps_hs&quot;</span>
+CONFIG_EXPERT<span class="s">=y</span>
+<span class="c"># CONFIG_SGETMASK_SYSCALL is not set</span>
+CONFIG_DEBUG_PERF_USE_VMALLOC<span class="s">=y</span>
+<span class="c"># CONFIG_COMPAT_BRK is not set</span>
+CONFIG_SLAB<span class="s">=y</span>
+CONFIG_KPROBES<span class="s">=y</span>
+CONFIG_COMPAT_32BIT_TIME<span class="s">=y</span>
+CONFIG_MODULES<span class="s">=y</span>
+<span class="c"># CONFIG_COMPACTION is not set</span>
+CONFIG_NET<span class="s">=y</span>
+CONFIG_PACKET<span class="s">=y</span>
+CONFIG_PACKET_DIAG<span class="s">=y</span>
+CONFIG_UNIX<span class="s">=y</span>
+CONFIG_UNIX_DIAG<span class="s">=y</span>
+CONFIG_NET_KEY<span class="s">=y</span>
+CONFIG_INET<span class="s">=y</span>
+<span class="c"># CONFIG_IPV6 is not set</span>
+<span class="c"># CONFIG_WIRELESS is not set</span>
+CONFIG_DEVTMPFS<span class="s">=y</span>
+CONFIG_DEVTMPFS_MOUNT<span class="s">=y</span>
+<span class="c"># CONFIG_STANDALONE is not set</span>
+<span class="c"># CONFIG_PREVENT_FIRMWARE_BUILD is not set</span>
+<span class="c"># CONFIG_FIRMWARE_MEMMAP is not set</span>
+CONFIG_OF<span class="s">=y</span>
+CONFIG_VIRTIO_BLK<span class="s">=y</span>
+CONFIG_NETDEVICES<span class="s">=y</span>
+CONFIG_VIRTIO_NET<span class="s">=y</span>
+<span class="c"># CONFIG_ETHERNET is not set</span>
+<span class="c"># CONFIG_WLAN is not set</span>
+CONFIG_INPUT_EVDEV<span class="s">=y</span>
+<span class="c"># CONFIG_INPUT_KEYBOARD is not set</span>
+<span class="c"># CONFIG_INPUT_MOUSE is not set</span>
+<span class="c"># CONFIG_SERIO is not set</span>
+<span class="c"># CONFIG_LEGACY_PTYS is not set</span>
+CONFIG_SERIAL_8250<span class="s">=y</span>
+CONFIG_SERIAL_8250_16550A_VARIANTS<span class="s">=y</span>
+CONFIG_SERIAL_8250_CONSOLE<span class="s">=y</span>
+CONFIG_SERIAL_8250_NR_UARTS<span class="s">=1</span>
+CONFIG_SERIAL_8250_RUNTIME_UARTS<span class="s">=1</span>
+CONFIG_SERIAL_8250_DW<span class="s">=y</span>
+CONFIG_SERIAL_OF_PLATFORM<span class="s">=y</span>
+<span class="c"># CONFIG_HW_RANDOM is not set</span>
+<span class="c"># CONFIG_HWMON is not set</span>
+<span class="c"># CONFIG_HID is not set</span>
+<span class="c"># CONFIG_USB_SUPPORT is not set</span>
+CONFIG_VIRTIO_MMIO<span class="s">=y</span>
+CONFIG_COMMON_CLK<span class="s">=y</span>
+<span class="c"># CONFIG_IOMMU_SUPPORT is not set</span>
+CONFIG_EXT2_FS<span class="s">=y</span>
+CONFIG_EXT2_FS_XATTR<span class="s">=y</span>
+CONFIG_TMPFS<span class="s">=y</span>
+<span class="c"># CONFIG_MISC_FILESYSTEMS is not set</span>
+CONFIG_NFS_FS<span class="s">=y</span>
+CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT<span class="s">=y</span>
+CONFIG_DEBUG_INFO_BTF<span class="s">=y</span>
+CONFIG_GDB_SCRIPTS<span class="s">=y</span>
+CONFIG_FRAME_WARN<span class="s">=1024</span>
+CONFIG_DEBUG_FS<span class="s">=y</span>
+CONFIG_DEBUG_MEMORY_INIT<span class="s">=y</span>
+<span class="c"># CONFIG_DEBUG_PREEMPT is not set</span>
+CONFIG_BOOTTIME_TRACING<span class="s">=y</span>
+CONFIG_IRQSOFF_TRACER<span class="s">=y</span>
+CONFIG_PREEMPT_TRACER<span class="s">=y</span>
+CONFIG_SCHED_TRACER<span class="s">=y</span>
+CONFIG_HWLAT_TRACER<span class="s">=y</span>
+CONFIG_FTRACE_SYSCALLS<span class="s">=y</span>
+CONFIG_TEST_BPF<span class="s">=m</span>
+</pre></div>
+</div>
+</div>
+<p>Build the Linux kernel:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">ARCH</span><span class="o">=</span>arc
+<span class="nb">export</span><span class="w"> </span><span class="nv">CROSS_COMPILE</span><span class="o">=</span>arc-linux-gnu-
+make<span class="w"> </span>-C<span class="w"> </span>..<span class="w"> </span><span class="nv">O</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="w"> </span>ebpf_jit_defconfig
+make<span class="w"> </span>menuconfig
+make<span class="w"> </span>-j<span class="w"> </span><span class="k">$(</span>nproc<span class="k">)</span>
+</pre></div>
+</div>
+</section>
+<section id="booting">
+<h2><a class="toc-backref" href="#id10" role="doc-backlink">Booting</a><a class="headerlink" href="#booting" title="Permalink to this heading">¶</a></h2>
+<p>Create a directory <code class="docutils literal notranslate"><span class="pre">boot</span></code> with this <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>:</p>
+<div class="highlight-Makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">LNXIMG</span><span class="w">  </span><span class="o">:=</span><span class="w"> </span>../linux/build/vmlinux
+
+<span class="nv">INSDIR</span><span class="w">  </span><span class="o">:=</span><span class="w"> </span>/tools/arc-linux-gnu
+<span class="nv">QINSDIR</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span>/tools/qemu
+
+<span class="nv">QEMU</span><span class="w">    </span><span class="o">:=</span><span class="w"> </span><span class="k">$(</span>QINSDIR<span class="k">)</span>/bin/qemu-system-arc
+<span class="nv">QPORT</span><span class="w">   </span><span class="o">:=</span><span class="w"> </span><span class="m">2000</span>
+<span class="nv">NPORT</span><span class="w">   </span><span class="o">:=</span><span class="w"> </span><span class="m">2001</span>
+<span class="nv">FTP</span><span class="w">     </span><span class="o">:=</span><span class="w"> </span><span class="nv">hostfwd</span><span class="o">=</span>tcp::2021-:21
+<span class="nv">SSH</span><span class="w">     </span><span class="o">:=</span><span class="w"> </span><span class="nv">hostfwd</span><span class="o">=</span>tcp::2022-:22
+<span class="nv">TLN</span><span class="w">     </span><span class="o">:=</span><span class="w"> </span><span class="nv">hostfwd</span><span class="o">=</span>tcp::2023-:23
+<span class="nv">NC</span><span class="w">      </span><span class="o">:=</span><span class="w"> </span><span class="nv">hostfwd</span><span class="o">=</span>tcp::<span class="k">$(</span>NPORT<span class="k">)</span>-:<span class="k">$(</span>NPORT<span class="k">)</span>
+<span class="nv">QFLAGS</span><span class="w">  </span><span class="o">:=</span><span class="w"> </span>-M<span class="w"> </span>virt<span class="w">                                            </span><span class="se">\</span>
+<span class="w">           </span>-nographic<span class="w">                                         </span><span class="se">\</span>
+<span class="w">           </span>-no-reboot<span class="w">                                         </span><span class="se">\</span>
+<span class="w">           </span>-global<span class="w"> </span>cpu.freq_hz<span class="o">=</span><span class="m">50000000</span><span class="w">                       </span><span class="se">\</span>
+<span class="w">           </span>-cpu<span class="w"> </span>archs<span class="w">                                         </span><span class="se">\</span>
+<span class="w">           </span>-netdev<span class="w"> </span>user,id<span class="o">=</span>net0,<span class="k">$(</span>FTP<span class="k">)</span>,<span class="k">$(</span>SSH<span class="k">)</span>,<span class="k">$(</span>TLN<span class="k">)</span>,<span class="k">$(</span>NC<span class="k">)</span><span class="w">    </span><span class="se">\</span>
+<span class="w">           </span>-device<span class="w"> </span>virtio-net-device,netdev<span class="o">=</span>net0
+
+<span class="nv">GDB</span><span class="w">     </span><span class="o">:=</span><span class="w"> </span><span class="k">$(</span>INSDIR<span class="k">)</span>/bin/arc-elf32-gdb
+
+<span class="nf">.PHONY</span><span class="o">:</span><span class="w"> </span><span class="n">linux</span> <span class="n">gdb</span> <span class="n">server</span> <span class="n">clean</span>
+
+<span class="nf">linux</span><span class="o">:</span>
+<span class="w">	</span><span class="k">$(</span>QEMU<span class="k">)</span><span class="w"> </span><span class="k">$(</span>QFLAGS<span class="k">)</span><span class="w"> </span>-kernel<span class="w"> </span><span class="k">$(</span>LNXIMG<span class="k">)</span>
+
+<span class="nf">server</span><span class="o">:</span>
+<span class="w">	</span><span class="k">$(</span>QEMU<span class="k">)</span><span class="w"> </span><span class="k">$(</span>QFLAGS<span class="k">)</span><span class="w"> </span>-kernel<span class="w"> </span><span class="k">$(</span>LNXIMG<span class="k">)</span><span class="w"> </span>-S<span class="w"> </span>-gdb<span class="w"> </span>tcp::<span class="k">$(</span>QPORT<span class="k">)</span>
+
+<span class="nf">gdb</span><span class="o">:</span>
+<span class="w">	</span><span class="k">$(</span>GDB<span class="k">)</span><span class="w"> </span>-tui<span class="w">                                           </span><span class="se">\</span>
+<span class="w">		     </span>-q<span class="w">                                             </span><span class="se">\</span>
+<span class="w">			   </span>-ex<span class="w"> </span><span class="s2">&quot;add-auto-load-safe-path </span><span class="k">$(</span>dir<span class="w"> </span><span class="k">$(</span>LNXIMG<span class="k">))</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">			   </span>-ex<span class="w"> </span><span class="s2">&quot;file </span><span class="k">$(</span>LNXIMG<span class="k">)</span><span class="s2">&quot;</span><span class="w">                           </span><span class="se">\</span>
+<span class="w">			   </span>-ex<span class="w"> </span><span class="s2">&quot;set remotetimeout 3000&quot;</span><span class="w">                   </span><span class="se">\</span>
+<span class="w">			   </span>-ex<span class="w"> </span><span class="s2">&quot;tar rem :</span><span class="k">$(</span>QPORT<span class="k">)</span><span class="s2">&quot;</span><span class="w">                        </span><span class="se">\</span>
+<span class="w">			   </span>-ex<span class="w"> </span><span class="s2">&quot;b bpf_int_jit_compile&quot;</span><span class="w">                    </span><span class="se">\</span>
+<span class="w">			   </span>-ex<span class="w"> </span><span class="s2">&quot;cont&quot;</span>
+
+<span class="nf">cgdb</span><span class="o">:</span>
+<span class="w">	</span>cgdb<span class="w"> </span>-d<span class="w"> </span><span class="k">$(</span>GDB<span class="k">)</span><span class="w"> </span>--<span class="w">                                   </span><span class="se">\</span>
+<span class="w">		   </span>-q<span class="w">                                             </span><span class="se">\</span>
+<span class="w">			 </span>-ex<span class="w"> </span><span class="s2">&quot;add-auto-load-safe-path </span><span class="k">$(</span>dir<span class="w"> </span><span class="k">$(</span>LNXIMG<span class="k">))</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">			 </span>-ex<span class="w"> </span><span class="s2">&quot;file </span><span class="k">$(</span>LNXIMG<span class="k">)</span><span class="s2">&quot;</span><span class="w">                           </span><span class="se">\</span>
+<span class="w">			 </span>-ex<span class="w"> </span><span class="s2">&quot;set remotetimeout 3000&quot;</span><span class="w">                   </span><span class="se">\</span>
+<span class="w">			 </span>-ex<span class="w"> </span><span class="s2">&quot;tar rem :</span><span class="k">$(</span>QPORT<span class="k">)</span><span class="s2">&quot;</span><span class="w">                        </span><span class="se">\</span>
+<span class="w">			 </span>-ex<span class="w"> </span><span class="s2">&quot;b bpf_int_jit_compile&quot;</span><span class="w">                    </span><span class="se">\</span>
+<span class="w">			 </span>-ex<span class="w"> </span><span class="s2">&quot;cont&quot;</span>
+
+<span class="nf">clean</span><span class="o">:</span>
+<span class="w">	</span><span class="k">$(</span>RM<span class="k">)</span><span class="w"> </span>*.exe<span class="w"> </span>*.sym<span class="w"> </span>gdbinit
+</pre></div>
+</div>
+<p>Just run <code class="docutils literal notranslate"><span class="pre">make</span></code> adn QEMU will boot.</p>
+</section>
+<section id="run-ebpf-tests">
+<h2><a class="toc-backref" href="#id11" role="doc-backlink">Run eBPF tests</a><a class="headerlink" href="#run-ebpf-tests" title="Permalink to this heading">¶</a></h2>
+<p>On host system:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ssh<span class="w"> </span>arc<span class="w"> </span><span class="s2">&quot;mount -t debugfs debugfs /sys/kernel/debug&quot;</span>
+ssh<span class="w"> </span>arc<span class="w"> </span><span class="s2">&quot;sysctl net.core.bpf_jit_enable=1&quot;</span>
+rsync<span class="w"> </span>../linux/build/lib/test_bpf.ko<span class="w"> </span>arc:
+</pre></div>
+</div>
+<p>On target system:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>insmod<span class="w"> </span>test_bpf.ko
+</pre></div>
+</div>
+</section>
+<section id="analyzing-dumps">
+<h2><a class="toc-backref" href="#id12" role="doc-backlink">Analyzing dumps</a><a class="headerlink" href="#analyzing-dumps" title="Permalink to this heading">¶</a></h2>
+<p>Create a directory <code class="docutils literal notranslate"><span class="pre">dump</span></code> with this <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>:</p>
+<div class="highlight-Makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">INSDIR</span><span class="w">  </span><span class="o">:=</span><span class="w"> </span>/tools/arc-linux-gnu
+
+<span class="nv">TEST</span><span class="w">    </span><span class="o">:=</span><span class="w"> </span>dump
+
+<span class="nv">AS</span><span class="w">      </span><span class="o">:=</span><span class="w"> </span><span class="k">$(</span>INSDIR<span class="k">)</span>/bin/arc-linux-gnu-as
+<span class="nv">LD</span><span class="w">      </span><span class="o">:=</span><span class="w"> </span><span class="k">$(</span>INSDIR<span class="k">)</span>/bin/arc-linux-gnu-ld
+<span class="nv">OBJDUMP</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="k">$(</span>INSDIR<span class="k">)</span>/bin/arc-linux-gnu-objdump
+
+<span class="nf">build</span><span class="o">:</span><span class="w"> </span><span class="k">$(</span><span class="nv">TEST</span><span class="k">)</span>
+
+<span class="nf">$(TEST)</span><span class="o">:</span><span class="w"> </span><span class="k">$(</span><span class="nv">TEST</span><span class="k">)</span>.<span class="n">s</span>
+<span class="w">	</span><span class="k">$(</span>AS<span class="k">)</span><span class="w"> </span>-mcpu<span class="o">=</span>archs<span class="w"> </span>-g3<span class="w"> </span>$^<span class="w"> </span>-o<span class="w"> </span><span class="k">$(</span>^:.s<span class="o">=</span>.o<span class="k">)</span>
+<span class="w">	</span><span class="k">$(</span>LD<span class="k">)</span><span class="w"> </span><span class="k">$(</span>^:.s<span class="o">=</span>.o<span class="k">)</span><span class="w"> </span>-o<span class="w"> </span><span class="nv">$@</span>
+
+<span class="nf">.PHONY</span><span class="o">:</span><span class="w"> </span><span class="n">linux</span> <span class="n">gdb</span> <span class="n">debug</span> <span class="n">dis</span> <span class="n">clean</span>
+
+<span class="nf">dis</span><span class="o">:</span>
+<span class="w">	</span><span class="k">$(</span>OBJDUMP<span class="k">)</span><span class="w"> </span>--visualize-jumps<span class="o">=</span>color<span class="w"> </span>--disassembler-options<span class="o">=</span><span class="s2">&quot;cpu=hs38_linux&quot;</span><span class="w"> </span>-d<span class="w"> </span><span class="k">$(</span>TEST<span class="k">)</span>
+
+<span class="nf">fetch</span><span class="o">:</span>
+<span class="w">	</span>rsync<span class="w"> </span>arc:/var/log/messages<span class="w"> </span>./jit.trace
+
+<span class="nf">clean</span><span class="o">:</span>
+<span class="w">	</span><span class="k">$(</span>RM<span class="k">)</span><span class="w"> </span><span class="k">$(</span>TEST<span class="k">)</span><span class="w"> </span>*.o<span class="w"> </span>*.sym<span class="w">  </span>gdbinit
+</pre></div>
+</div>
+<p>Get raw JITed bytes from test’s output and save it to <code class="docutils literal notranslate"><span class="pre">dump</span></code> and run <code class="docutils literal notranslate"><span class="pre">make</span></code>
+to get assembler code.</p>
+</section>
+<section id="build-a-simple-bpf-application">
+<h2><a class="toc-backref" href="#id13" role="doc-backlink">Build a simple BPF application</a><a class="headerlink" href="#build-a-simple-bpf-application" title="Permalink to this heading">¶</a></h2>
+<p>Generate`` vmlinux.h`` file from <code class="docutils literal notranslate"><span class="pre">vmlinux</span></code> image, copy all necessary libraries and headers:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>include/bpf
+bpftool<span class="w"> </span>--debug<span class="w"> </span>btf<span class="w"> </span>dump<span class="w"> </span>file<span class="w"> </span>../linux/build/vmlinux<span class="w"> </span>format<span class="w"> </span>c<span class="w"> </span>&gt;<span class="w"> </span>include/vmlinux.h
+mkdir<span class="w"> </span>lib
+cp<span class="w"> </span>-f<span class="w"> </span>../buildroot/build/build/libbpf-*/src/libbpf.a<span class="w"> </span>lib
+cp<span class="w"> </span>-f<span class="w"> </span>../buildroot/build/build/elfutils-*/libelf/libelf.a<span class="w"> </span>lib
+cp<span class="w"> </span>-f<span class="w"> </span>../buildroot/build/build/libzlib*/libz.a<span class="w"> </span>lib
+cp<span class="w"> </span>-r<span class="w"> </span>-f<span class="w"> </span>../buildroot/build/build/libbpf-*/src/*.h<span class="w"> </span>include/bpf/
+cp<span class="w"> </span>-r<span class="w"> </span>-f<span class="w"> </span>../buildroot/build/build/libbpf-*/include/uapi/linux<span class="w"> </span>include
+</pre></div>
+</div>
+<p>We are going to use an example from <a class="reference external" href="https://github.com/libbpf/libbpf-bootstrap">https://github.com/libbpf/libbpf-bootstrap</a> repository.
+Download sources for <cite>minimal.c`</cite> example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/libbpf/libbpf-bootstrap
+cp<span class="w"> </span>libbpf-bootstrap/examples/c/minimal.*<span class="w"> </span>.
+</pre></div>
+</div>
+<p>Compile an object file for BPF part of the program:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>clang<span class="w"> </span>-g<span class="w"> </span>-O2<span class="w"> </span>-target<span class="w"> </span>bpf<span class="w"> </span>-D_TARGET_ARCH_arc<span class="w"> </span>-I./include<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-idirafter<span class="w"> </span>/tools/arc-linux-gnu/sysroot/usr/include<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-c<span class="w"> </span>minimal.bpf.c<span class="w"> </span>-o<span class="w"> </span>minimal.bpf.o
+</pre></div>
+</div>
+<p>Generate a skeleton file for a program:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>bpftool<span class="w"> </span>gen<span class="w"> </span>skeleton<span class="w"> </span>minimal.bpf.o<span class="w"> </span>&gt;<span class="w"> </span>minimal.skel.h
+</pre></div>
+</div>
+<p>Build the final program and copy:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>arc-linux-gnu-gcc<span class="w"> </span>-g<span class="w"> </span>-Wall<span class="w"> </span>-I./include<span class="w"> </span>-L./lib<span class="w"> </span>minimal.c<span class="w"> </span>-lbpf<span class="w"> </span>-lelf<span class="w"> </span>-lz<span class="w"> </span>-o<span class="w"> </span>minimal
+</pre></div>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">🟡 Checking JIT for eBPF</a><ul>
+<li><a class="reference internal" href="#build-and-install-elfutils">Build and install elfutils</a></li>
+<li><a class="reference internal" href="#build-and-install-pahole">Build and install Pahole</a></li>
+<li><a class="reference internal" href="#generate-and-setup-openssh-keys">Generate and setup OpenSSH keys</a></li>
+<li><a class="reference internal" href="#building-rootfs-cpio">Building <code class="docutils literal notranslate"><span class="pre">rootfs.cpio</span></code></a></li>
+<li><a class="reference internal" href="#building-a-linux-kernel">Building a Linux kernel</a></li>
+<li><a class="reference internal" href="#booting">Booting</a></li>
+<li><a class="reference internal" href="#run-ebpf-tests">Run eBPF tests</a></li>
+<li><a class="reference internal" href="#analyzing-dumps">Analyzing dumps</a></li>
+<li><a class="reference internal" href="#build-a-simple-bpf-application">Build a simple BPF application</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="../index.html"
+                          title="previous chapter">Tasks</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="../glibc_mmu_bug.html"
+                          title="next chapter">🟡 glibc testsuite fails with vanilla Linux kernels</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/tasks/ebpf_jit/ebpf_jit.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../glibc_mmu_bug.html" title="🟡 glibc testsuite fails with vanilla Linux kernels"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="Tasks"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Kolerov&#39;s Notes 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Tasks</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">🟡 Checking JIT for eBPF</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Yuriy Kolerov.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+    </div>
+  </body>
+</html>
