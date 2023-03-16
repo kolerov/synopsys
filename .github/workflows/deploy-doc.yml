@@ -1,0 +1,25 @@
+name: "Build and deploy documentation"
+on:
+  push:
+    paths:
+      - docs/**
+
+jobs:
+  doc-build-and-deploy:
+    name: Build and deploy documentation
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build documentation
+        uses: ammaraskar/sphinx-action@0.4
+        with:
+          docs-folder: docs
+
+      - name: Deploy documentation
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: docs/_build/html
