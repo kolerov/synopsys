@@ -6,4 +6,4 @@ Snippets
 
    gdb.rst
    gcc.rst
-
+   git.rst
