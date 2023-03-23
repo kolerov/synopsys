@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>🟡 Checking JIT for eBPF &#8212; Kolerov&#39;s Notes 0.1 documentation</title>
+    <title>🟡 eBPF in Linux for ARC &#8212; Kolerov&#39;s Notes 0.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
     
@@ -33,7 +33,7 @@
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../index.html">Kolerov&#39;s Notes 0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Tasks</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">🟡 Checking JIT for eBPF</a></li> 
+        <li class="nav-item nav-item-this"><a href="">🟡 eBPF in Linux for ARC</a></li> 
       </ul>
     </div>  
 
@@ -42,8 +42,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="checking-jit-for-ebpf">
-<h1>🟡 Checking JIT for eBPF<a class="headerlink" href="#checking-jit-for-ebpf" title="Permalink to this heading">¶</a></h1>
+  <section id="ebpf-in-linux-for-arc">
+<h1>🟡 eBPF in Linux for ARC<a class="headerlink" href="#ebpf-in-linux-for-arc" title="Permalink to this heading">¶</a></h1>
 <nav class="contents local" id="contents">
 <ul class="simple">
 <li><p><a class="reference internal" href="#build-and-install-elfutils" id="id5">Build and install elfutils</a></p></li>
@@ -51,10 +51,11 @@
 <li><p><a class="reference internal" href="#generate-and-setup-openssh-keys" id="id7">Generate and setup OpenSSH keys</a></p></li>
 <li><p><a class="reference internal" href="#building-rootfs-cpio" id="id8">Building <code class="docutils literal notranslate"><span class="pre">rootfs.cpio</span></code></a></p></li>
 <li><p><a class="reference internal" href="#building-a-linux-kernel" id="id9">Building a Linux kernel</a></p></li>
-<li><p><a class="reference internal" href="#booting" id="id10">Booting</a></p></li>
-<li><p><a class="reference internal" href="#run-ebpf-tests" id="id11">Run eBPF tests</a></p></li>
-<li><p><a class="reference internal" href="#analyzing-dumps" id="id12">Analyzing dumps</a></p></li>
-<li><p><a class="reference internal" href="#build-a-simple-bpf-application" id="id13">Build a simple BPF application</a></p></li>
+<li><p><a class="reference internal" href="#workaround-for-complex-float-error" id="id10">Workaround for <code class="docutils literal notranslate"><span class="pre">complex</span> <span class="pre">float</span></code> error</a></p></li>
+<li><p><a class="reference internal" href="#booting" id="id11">Booting</a></p></li>
+<li><p><a class="reference internal" href="#run-ebpf-tests" id="id12">Run eBPF tests</a></p></li>
+<li><p><a class="reference internal" href="#analyzing-dumps" id="id13">Analyzing dumps</a></p></li>
+<li><p><a class="reference internal" href="#build-a-simple-bpf-application" id="id14">Build a simple BPF application</a></p></li>
 </ul>
 </nav>
 <section id="build-and-install-elfutils">
@@ -260,6 +261,8 @@ mkdir<span class="w"> </span>linux/build
 <div class="literal-block-wrapper docutils container" id="id4">
 <div class="code-block-caption"><span class="caption-text">ebpf_jit_defconfig</span><a class="headerlink" href="#id4" title="Permalink to this code">¶</a></div>
 <div class="highlight-linuxconfig notranslate"><div class="highlight"><pre><span></span><span class="c"># CONFIG_SWAP is not set</span>
+CONFIG_PERF_EVENTS<span class="s">=y</span>
+CONFIG_BPF_EVENTS<span class="s">=y</span>
 CONFIG_SYSVIPC<span class="s">=y</span>
 CONFIG_POSIX_MQUEUE<span class="s">=y</span>
 <span class="c"># CONFIG_CROSS_MEMORY_ATTACH is not set</span>
@@ -329,6 +332,7 @@ CONFIG_EXT2_FS_XATTR<span class="s">=y</span>
 CONFIG_TMPFS<span class="s">=y</span>
 <span class="c"># CONFIG_MISC_FILESYSTEMS is not set</span>
 CONFIG_NFS_FS<span class="s">=y</span>
+CONFIG_DEBUG_INFO<span class="s">=y</span>
 CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT<span class="s">=y</span>
 CONFIG_DEBUG_INFO_BTF<span class="s">=y</span>
 CONFIG_GDB_SCRIPTS<span class="s">=y</span>
@@ -355,8 +359,31 @@ make<span class="w"> </span>-j<span class="w"> </span><span class="k">$(</span>n
 </pre></div>
 </div>
 </section>
+<section id="workaround-for-complex-float-error">
+<h2><a class="toc-backref" href="#id10" role="doc-backlink">Workaround for <code class="docutils literal notranslate"><span class="pre">complex</span> <span class="pre">float</span></code> error</a><a class="headerlink" href="#workaround-for-complex-float-error" title="Permalink to this heading">¶</a></h2>
+<p>ARC toolchains generate <code class="docutils literal notranslate"><span class="pre">complex</span> <span class="pre">float</span></code> DIE entries in <code class="docutils literal notranslate"><span class="pre">libgcc</span></code>.
+At the moment such entries are not yet handled by pahole.
+So, it’s necessary to disable BTF floats.</p>
+<p>If you want to build Linux kernel from another branch with BTF information you
+can apply this patch (<a class="reference external" href="https://github.com/foss-for-synopsys-dwc-arc-processors/linux/commit/b17d1955b67493afe37430694c8982411336fc4c">https://github.com/foss-for-synopsys-dwc-arc-processors/linux/commit/b17d1955b67493afe37430694c8982411336fc4c</a>):</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gh">diff --git a/scripts/pahole-flags.sh b/scripts/pahole-flags.sh</span>
+<span class="gh">index 0d99ef17e4a5..23af14c6ef94 100755</span>
+<span class="gd">--- a/scripts/pahole-flags.sh</span>
+<span class="gi">+++ b/scripts/pahole-flags.sh</span>
+<span class="gu">@@ -14,7 +14,7 @@ if [ &quot;${pahole_ver}&quot; -ge &quot;118&quot; ] &amp;&amp; [ &quot;${pahole_ver}&quot; -le &quot;121&quot; ]; then</span>
+<span class="w"> </span>       extra_paholeopt=&quot;${extra_paholeopt} --skip_encoding_btf_vars&quot;
+<span class="w">fi</span>
+<span class="w">if [ &quot;${pahole_ver}&quot; -ge &quot;121&quot; ]; then</span>
+<span class="gd">-       extra_paholeopt=&quot;${extra_paholeopt} --btf_gen_floats&quot;</span>
+<span class="gi">+       extra_paholeopt=&quot;${extra_paholeopt}&quot;</span>
+<span class="w">fi</span>
+<span class="w">if [ &quot;${pahole_ver}&quot; -ge &quot;122&quot; ]; then</span>
+<span class="w"> </span>       extra_paholeopt=&quot;${extra_paholeopt} -j&quot;
+</pre></div>
+</div>
+</section>
 <section id="booting">
-<h2><a class="toc-backref" href="#id10" role="doc-backlink">Booting</a><a class="headerlink" href="#booting" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id11" role="doc-backlink">Booting</a><a class="headerlink" href="#booting" title="Permalink to this heading">¶</a></h2>
 <p>Create a directory <code class="docutils literal notranslate"><span class="pre">boot</span></code> with this <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>:</p>
 <div class="highlight-Makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">LNXIMG</span><span class="w">  </span><span class="o">:=</span><span class="w"> </span>../linux/build/vmlinux
 
@@ -415,7 +442,7 @@ make<span class="w"> </span>-j<span class="w"> </span><span class="k">$(</span>n
 <p>Just run <code class="docutils literal notranslate"><span class="pre">make</span></code> adn QEMU will boot.</p>
 </section>
 <section id="run-ebpf-tests">
-<h2><a class="toc-backref" href="#id11" role="doc-backlink">Run eBPF tests</a><a class="headerlink" href="#run-ebpf-tests" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id12" role="doc-backlink">Run eBPF tests</a><a class="headerlink" href="#run-ebpf-tests" title="Permalink to this heading">¶</a></h2>
 <p>On host system:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ssh<span class="w"> </span>arc<span class="w"> </span><span class="s2">&quot;mount -t debugfs debugfs /sys/kernel/debug&quot;</span>
 ssh<span class="w"> </span>arc<span class="w"> </span><span class="s2">&quot;sysctl net.core.bpf_jit_enable=1&quot;</span>
@@ -428,7 +455,7 @@ rsync<span class="w"> </span>../linux/build/lib/test_bpf.ko<span class="w"> </sp
 </div>
 </section>
 <section id="analyzing-dumps">
-<h2><a class="toc-backref" href="#id12" role="doc-backlink">Analyzing dumps</a><a class="headerlink" href="#analyzing-dumps" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id13" role="doc-backlink">Analyzing dumps</a><a class="headerlink" href="#analyzing-dumps" title="Permalink to this heading">¶</a></h2>
 <p>Create a directory <code class="docutils literal notranslate"><span class="pre">dump</span></code> with this <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>:</p>
 <div class="highlight-Makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">INSDIR</span><span class="w">  </span><span class="o">:=</span><span class="w"> </span>/tools/arc-linux-gnu
 
@@ -460,8 +487,8 @@ rsync<span class="w"> </span>../linux/build/lib/test_bpf.ko<span class="w"> </sp
 to get assembler code.</p>
 </section>
 <section id="build-a-simple-bpf-application">
-<h2><a class="toc-backref" href="#id13" role="doc-backlink">Build a simple BPF application</a><a class="headerlink" href="#build-a-simple-bpf-application" title="Permalink to this heading">¶</a></h2>
-<p>Generate`` vmlinux.h`` file from <code class="docutils literal notranslate"><span class="pre">vmlinux</span></code> image, copy all necessary libraries and headers:</p>
+<h2><a class="toc-backref" href="#id14" role="doc-backlink">Build a simple BPF application</a><a class="headerlink" href="#build-a-simple-bpf-application" title="Permalink to this heading">¶</a></h2>
+<p>Generate <code class="docutils literal notranslate"><span class="pre">vmlinux.h</span></code> file from <code class="docutils literal notranslate"><span class="pre">vmlinux</span></code> image, copy all necessary libraries and headers:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>include/bpf
 bpftool<span class="w"> </span>--debug<span class="w"> </span>btf<span class="w"> </span>dump<span class="w"> </span>file<span class="w"> </span>../linux/build/vmlinux<span class="w"> </span>format<span class="w"> </span>c<span class="w"> </span>&gt;<span class="w"> </span>include/vmlinux.h
 mkdir<span class="w"> </span>lib
@@ -484,12 +511,17 @@ cp<span class="w"> </span>libbpf-bootstrap/examples/c/minimal.*<span class="w"> 
 <span class="w">      </span>-c<span class="w"> </span>minimal.bpf.c<span class="w"> </span>-o<span class="w"> </span>minimal.bpf.o
 </pre></div>
 </div>
+<p>You can inspect eBPF code using this command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>llvm-objdump<span class="w"> </span>-S<span class="w"> </span>--no-show-raw-insn<span class="w"> </span>minimal.bpf.o
+</pre></div>
+</div>
 <p>Generate a skeleton file for a program:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>bpftool<span class="w"> </span>gen<span class="w"> </span>skeleton<span class="w"> </span>minimal.bpf.o<span class="w"> </span>&gt;<span class="w"> </span>minimal.skel.h
 </pre></div>
 </div>
-<p>Build the final program and copy:</p>
+<p>Build the final program and copy it to the target:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>arc-linux-gnu-gcc<span class="w"> </span>-g<span class="w"> </span>-Wall<span class="w"> </span>-I./include<span class="w"> </span>-L./lib<span class="w"> </span>minimal.c<span class="w"> </span>-lbpf<span class="w"> </span>-lelf<span class="w"> </span>-lz<span class="w"> </span>-o<span class="w"> </span>minimal
+rsync<span class="w"> </span>minimal<span class="w"> </span>arc:
 </pre></div>
 </div>
 </section>
@@ -505,12 +537,13 @@ cp<span class="w"> </span>libbpf-bootstrap/examples/c/minimal.*<span class="w"> 
   <div>
     <h3><a href="../../index.html">Table of Contents</a></h3>
     <ul>
-<li><a class="reference internal" href="#">🟡 Checking JIT for eBPF</a><ul>
+<li><a class="reference internal" href="#">🟡 eBPF in Linux for ARC</a><ul>
 <li><a class="reference internal" href="#build-and-install-elfutils">Build and install elfutils</a></li>
 <li><a class="reference internal" href="#build-and-install-pahole">Build and install Pahole</a></li>
 <li><a class="reference internal" href="#generate-and-setup-openssh-keys">Generate and setup OpenSSH keys</a></li>
 <li><a class="reference internal" href="#building-rootfs-cpio">Building <code class="docutils literal notranslate"><span class="pre">rootfs.cpio</span></code></a></li>
 <li><a class="reference internal" href="#building-a-linux-kernel">Building a Linux kernel</a></li>
+<li><a class="reference internal" href="#workaround-for-complex-float-error">Workaround for <code class="docutils literal notranslate"><span class="pre">complex</span> <span class="pre">float</span></code> error</a></li>
 <li><a class="reference internal" href="#booting">Booting</a></li>
 <li><a class="reference internal" href="#run-ebpf-tests">Run eBPF tests</a></li>
 <li><a class="reference internal" href="#analyzing-dumps">Analyzing dumps</a></li>
@@ -565,7 +598,7 @@ cp<span class="w"> </span>libbpf-bootstrap/examples/c/minimal.*<span class="w"> 
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../index.html">Kolerov&#39;s Notes 0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Tasks</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">🟡 Checking JIT for eBPF</a></li> 
+        <li class="nav-item nav-item-this"><a href="">🟡 eBPF in Linux for ARC</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

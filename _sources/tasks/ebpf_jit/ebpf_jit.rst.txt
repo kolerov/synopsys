@@ -1,4 +1,4 @@
-🟡 Checking JIT for eBPF
+🟡 eBPF in Linux for ARC
 ========================
 
 .. contents:: :local:
@@ -229,6 +229,8 @@ Save this configuration (user your own path to ``.cpio`` file) to ``arch/arc/con
     :caption: ebpf_jit_defconfig
 
     # CONFIG_SWAP is not set
+    CONFIG_PERF_EVENTS=y
+    CONFIG_BPF_EVENTS=y
     CONFIG_SYSVIPC=y
     CONFIG_POSIX_MQUEUE=y
     # CONFIG_CROSS_MEMORY_ATTACH is not set
@@ -298,6 +300,7 @@ Save this configuration (user your own path to ``.cpio`` file) to ``arch/arc/con
     CONFIG_TMPFS=y
     # CONFIG_MISC_FILESYSTEMS is not set
     CONFIG_NFS_FS=y
+    CONFIG_DEBUG_INFO=y
     CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
     CONFIG_DEBUG_INFO_BTF=y
     CONFIG_GDB_SCRIPTS=y
@@ -322,6 +325,32 @@ Build the Linux kernel:
     make -C .. O=$(pwd) ebpf_jit_defconfig
     make menuconfig
     make -j $(nproc)
+
+Workaround for ``complex float`` error
+--------------------------------------
+
+ARC toolchains generate ``complex float`` DIE entries in ``libgcc``.
+At the moment such entries are not yet handled by pahole.
+So, it's necessary to disable BTF floats.
+
+If you want to build Linux kernel from another branch with BTF information you
+can apply this patch (https://github.com/foss-for-synopsys-dwc-arc-processors/linux/commit/b17d1955b67493afe37430694c8982411336fc4c):
+
+.. code-block:: diff
+
+    diff --git a/scripts/pahole-flags.sh b/scripts/pahole-flags.sh
+    index 0d99ef17e4a5..23af14c6ef94 100755
+    --- a/scripts/pahole-flags.sh
+    +++ b/scripts/pahole-flags.sh
+    @@ -14,7 +14,7 @@ if [ "${pahole_ver}" -ge "118" ] && [ "${pahole_ver}" -le "121" ]; then
+            extra_paholeopt="${extra_paholeopt} --skip_encoding_btf_vars"
+    fi
+    if [ "${pahole_ver}" -ge "121" ]; then
+    -       extra_paholeopt="${extra_paholeopt} --btf_gen_floats"
+    +       extra_paholeopt="${extra_paholeopt}"
+    fi
+    if [ "${pahole_ver}" -ge "122" ]; then
+            extra_paholeopt="${extra_paholeopt} -j"
 
 Booting
 -------
@@ -364,7 +393,7 @@ to get assembler code.
 Build a simple BPF application
 ------------------------------
 
-Generate`` vmlinux.h`` file from ``vmlinux`` image, copy all necessary libraries and headers:
+Generate ``vmlinux.h`` file from ``vmlinux`` image, copy all necessary libraries and headers:
 
 .. code-block:: bash
 
@@ -393,14 +422,23 @@ Compile an object file for BPF part of the program:
           -idirafter /tools/arc-linux-gnu/sysroot/usr/include \
           -c minimal.bpf.c -o minimal.bpf.o
 
+You can inspect eBPF code using this command:
+
+.. code-block:: bash
+
+    llvm-objdump -S --no-show-raw-insn minimal.bpf.o
+
 Generate a skeleton file for a program:
 
 .. code-block:: bash
 
     bpftool gen skeleton minimal.bpf.o > minimal.skel.h
 
-Build the final program and copy:
+Build the final program and copy it to the target:
 
 .. code-block:: bash
 
     arc-linux-gnu-gcc -g -Wall -I./include -L./lib minimal.c -lbpf -lelf -lz -o minimal
+    rsync minimal arc:
+
+
