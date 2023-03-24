@@ -73,16 +73,16 @@
 <h2>Build and install QEMU<a class="headerlink" href="#build-and-install-qemu" title="Permalink to this heading">¶</a></h2>
 <p>Retrieve source code and build:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/foss-for-synopsys-dwc-arc-processors/qemu
-mkdir<span class="w"> </span>qemu_build
-<span class="nb">cd</span><span class="w"> </span>qemu_build
-../qemu/configure<span class="w"> </span>--target-list<span class="o">=</span>arc-softmmu,arc64-softmmu,arc-linux-user,arc64-linux-user<span class="w"> </span><span class="se">\</span>
-<span class="w">                  </span>--enable-debug<span class="w"> </span>--enable-debug-tcg<span class="w"> </span>--prefix<span class="o">=</span>/home/ykolerov/tools/qemu
+mkdir<span class="w"> </span>-p<span class="w"> </span>qemu/build
+<span class="nb">cd</span><span class="w"> </span>qemu/build
+../configure<span class="w"> </span>--target-list<span class="o">=</span>arc-softmmu,arc64-softmmu,arc-linux-user,arc64-linux-user<span class="w"> </span><span class="se">\</span>
+<span class="w">             </span>--enable-debug<span class="w"> </span>--enable-debug-tcg<span class="w"> </span>--prefix<span class="o">=</span>/tools/qemu
 make<span class="w"> </span>-j<span class="w"> </span><span class="k">$(</span>nproc<span class="k">)</span>
 make<span class="w"> </span>install
 </pre></div>
 </div>
 <p>Add these variables to your <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> or <code class="docutils literal notranslate"><span class="pre">.profile</span></code>:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">QEMU_HOME</span><span class="o">=</span>/home/ykolerov/tools/qemu
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">QEMU_HOME</span><span class="o">=</span>/tools/qemu
 <span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$QEMU_HOME</span>/bin:<span class="nv">$PATH</span>
 </pre></div>
 </div>
