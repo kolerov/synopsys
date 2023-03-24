@@ -65,6 +65,8 @@ Install all necessary packages for work and dependencies for building a toolchai
 Configure ``.profile``
 ----------------------
 
+Note that Fedora uses ``.bash_profile`` by default for users instead of ``.profile``.
+
 .. code-block:: bash
 
     # Enable networking through VPN in WSL
