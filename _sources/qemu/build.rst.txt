@@ -21,7 +21,7 @@ Install packages for Fedora
 .. code-block:: shell
 
     sudo dnf install git glib2-devel libfdt-devel pixman-devel zlib-devel bzip2 \
-                     ninja-build python3libaio-devel libcap-ng-devel libiscsi-devel \
+                     ninja-build python3 libaio-devel libcap-ng-devel libiscsi-devel \
                      capstone-devel gtk3-devel SDL2-devel vte291-devel ncurses-devel \
                      libseccomp-devel nettle-devel libattr-devel libjpeg-devel \
                      brlapi-devel libgcrypt-devel lzo-devel snappy-devel \
