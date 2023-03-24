@@ -150,6 +150,6 @@ Elfutils
     git clone https://sourceware.org/git/elfutils.git
     cd elfutils
     autoreconf -fi
-    ./configure --prefix=/tools/elfutils
+    ./configure --prefix=/tools/elfutils --enable-maintainer-mode
     make
     make install
