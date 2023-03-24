@@ -39,7 +39,8 @@ Retrieve source code and build:
     git clone https://github.com/foss-for-synopsys-dwc-arc-processors/qemu
     mkdir qemu_build
     cd qemu_build
-    ../qemu/configure --target-list=arc-softmmu,arc64-softmmu,arc-linux-user,arc64-linux-user --enable-debug --enable-debug-tcg --prefix=/home/ykolerov/tools/qemu
+    ../qemu/configure --target-list=arc-softmmu,arc64-softmmu,arc-linux-user,arc64-linux-user \
+                      --enable-debug --enable-debug-tcg --prefix=/home/ykolerov/tools/qemu
     make -j $(nproc)
     make install
 
