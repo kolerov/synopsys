@@ -37,10 +37,10 @@ Retrieve source code and build:
 .. code-block:: shell
 
     git clone https://github.com/foss-for-synopsys-dwc-arc-processors/qemu
-    mkdir qemu_build
-    cd qemu_build
-    ../qemu/configure --target-list=arc-softmmu,arc64-softmmu,arc-linux-user,arc64-linux-user \
-                      --enable-debug --enable-debug-tcg --prefix=/home/ykolerov/tools/qemu
+    mkdir -p qemu/build
+    cd qemu/build
+    ../configure --target-list=arc-softmmu,arc64-softmmu,arc-linux-user,arc64-linux-user \
+                 --enable-debug --enable-debug-tcg --prefix=/tools/qemu
     make -j $(nproc)
     make install
 
@@ -48,6 +48,6 @@ Add these variables to your ``.bashrc`` or ``.profile``:
 
 .. code-block:: shell
 
-    export QEMU_HOME=/home/ykolerov/tools/qemu
+    export QEMU_HOME=/tools/qemu
     export PATH=$QEMU_HOME/bin:$PATH
 
