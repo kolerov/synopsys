@@ -106,22 +106,20 @@ sudo<span class="w"> </span>dnf<span class="w"> </span>groupinstall<span class="
 </section>
 <section id="configure-profile">
 <h2><a class="toc-backref" href="#id3" role="doc-backlink">Configure <code class="docutils literal notranslate"><span class="pre">.profile</span></code></a><a class="headerlink" href="#configure-profile" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Enable networking through VPN</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Enable networking through VPN in WSL</span>
 wsl.exe<span class="w"> </span>-d<span class="w"> </span>wsl-vpnkit<span class="w"> </span>service<span class="w"> </span>wsl-vpnkit<span class="w"> </span>start
 
-<span class="nb">export</span><span class="w"> </span><span class="nv">BASE_SCRATCH</span><span class="o">=</span><span class="s2">&quot;/SCRATCH/ykolerov&quot;</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">BASE_YKOLEROV</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">BASE</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">BASE_YKOLEROV</span><span class="si">}</span><span class="s2">&quot;</span>
-
+<span class="c1"># Common places</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">BASE</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">TOOLS</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$BASE</span><span class="s2">/tools&quot;</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">REPOS</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$BASE</span><span class="s2">/repos&quot;</span>
 
 <span class="c1"># Toolchain</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$TOOLS</span><span class="s2">/arc64-elf/bin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$TOOLS</span><span class="s2">/arc-elf32/bin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$TOOLS</span><span class="s2">/release-2022.09/arc-snps-linux-gnu/bin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$TOOLS</span><span class="s2">/release-2022.09/arc64-snps-linux-gnu/bin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$TOOLS</span><span class="s2">/release-2022.09/arc32-snps-linux-uclibc/bin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$TOOLS</span><span class="s2">/arc64-elf/bin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$TOOLS</span><span class="s2">/arc-linux-gnu/bin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$TOOLS</span><span class="s2">/arc32-linux-uclibc/bin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$TOOLS</span><span class="s2">/arc64-linux-gnu/bin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$TOOLS</span><span class="s2">/i686-w64-mingw32/bin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$TOOLS</span><span class="s2">/x86_64-w64-mingw32/bin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
 
