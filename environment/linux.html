@@ -78,17 +78,26 @@ sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> <
 </section>
 <section id="bootstrap-fedora-37">
 <h2><a class="toc-backref" href="#id2" role="doc-backlink">Bootstrap Fedora 37</a><a class="headerlink" href="#bootstrap-fedora-37" title="Permalink to this heading">¶</a></h2>
-<p>Install common packages:</p>
+<p>Install main groups:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>dnf<span class="w"> </span>update
-sudo<span class="w"> </span>dnf<span class="w"> </span>groupinstall<span class="w"> </span><span class="s2">&quot;Development Tools&quot;</span><span class="w"> </span><span class="s2">&quot;Development Libraries&quot;</span>
-sudo<span class="w"> </span>dnf<span class="w"> </span>install<span class="w"> </span>mercurial<span class="w"> </span>mc<span class="w"> </span>cmake<span class="w"> </span>tmux<span class="w"> </span>screen<span class="w"> </span>minicom<span class="w"> </span>htop<span class="w"> </span>nmap
+sudo<span class="w"> </span>dnf<span class="w"> </span>groupinstall<span class="w"> </span><span class="s2">&quot;Development Tools&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">                      </span><span class="s2">&quot;Development Libraries&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">                      </span><span class="s2">&quot;C Development Tools and Libraries&quot;</span>
 </pre></div>
 </div>
-<p>Install packages for building a toolchain using Crosstool-NG or our scripts:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>dnf<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>autoconf<span class="w"> </span>bison<span class="w"> </span>bzip2<span class="w"> </span>diffutils<span class="w"> </span>file<span class="w"> </span>flex<span class="w"> </span>gcc-c++<span class="w"> </span>git<span class="w"> </span><span class="se">\</span>
-<span class="w">                    </span>gperf<span class="w"> </span>help2man<span class="w"> </span>libtool<span class="w"> </span>make<span class="w"> </span>ncurses-devel<span class="w"> </span>patch<span class="w"> </span><span class="se">\</span>
-<span class="w">                    </span>perl-Thread-Queue<span class="w"> </span>python3<span class="w"> </span>rsync<span class="w"> </span>texinfo<span class="w"> </span>unzip<span class="w"> </span>wget<span class="w"> </span><span class="se">\</span>
-<span class="w">                    </span>which<span class="w"> </span>xz<span class="w"> </span>expat<span class="w"> </span>expat-devel<span class="w"> </span>dwarves
+<p>Install all necessary packages for work and dependencies for building a toolchain:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>dnf<span class="w"> </span>install<span class="w"> </span>autoconf<span class="w"> </span>bison<span class="w"> </span>brlapi-devel<span class="w"> </span>bzip2<span class="w"> </span>capstone-devel<span class="w"> </span>cmake<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>curl-devel<span class="w"> </span>cyrus-sasl-devel<span class="w"> </span>diffutils<span class="w"> </span>dwarves<span class="w"> </span>expat<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>expat-devel<span class="w"> </span>file<span class="w"> </span>flex<span class="w"> </span>gcc-c++<span class="w"> </span>git<span class="w"> </span>gperf<span class="w"> </span>gtk3-devel<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>help2man<span class="w"> </span>htop<span class="w"> </span>libaio-devel<span class="w"> </span>libattr-devel<span class="w"> </span>libcap-ng-devel<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>libfdt-devel<span class="w"> </span>libgcrypt-devel<span class="w"> </span>libibverbs-devel<span class="w"> </span>libiscsi-devel<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>libjpeg-devel<span class="w"> </span>libpng-devel<span class="w"> </span>librdmacm-devel<span class="w"> </span>libseccomp-devel<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>libssh-devel<span class="w"> </span>libtool<span class="w"> </span>libusbx-devel<span class="w"> </span>libuuid-devel<span class="w"> </span>lzo-devel<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>make<span class="w"> </span>mc<span class="w"> </span>mercurial<span class="w"> </span>minicom<span class="w"> </span>ncurses-devel<span class="w"> </span>nettle-devel<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>ninja-build<span class="w"> </span>nmap<span class="w"> </span>patch<span class="w"> </span>perl-Thread-Queue<span class="w"> </span>pixman-devel<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>pulseaudio-libs-devel<span class="w"> </span>python3<span class="w"> </span>rsync<span class="w"> </span>SDL2-devel<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>screen<span class="w"> </span>snappy-devel<span class="w"> </span>systemtap-sdt-devel<span class="w"> </span>texinfo<span class="w"> </span>tmux<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>unzip<span class="w"> </span>vte291-devel<span class="w"> </span>wget<span class="w"> </span>which<span class="w"> </span>xz<span class="w"> </span>zlib-devel
 </pre></div>
 </div>
 </section>
