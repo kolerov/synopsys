@@ -92,12 +92,12 @@ Configure ``.profile``
     export BR2_DL_DIR="$REPOS/buildroot_dl"
 
     # Elfutils
-    export PATH="/tools/elfutils/bin:$PATH"
-    export LD_LIBRARY_PATH="/tools/elfutils/lib:$LD_LIBRARY_PATH"
+    export PATH=/tools/elfutils/bin:$PATH
+    export LD_LIBRARY_PATH=/tools/elfutils/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 
     # Pahole
-    export PATH="/tools/pahole/bin:$PATH"
-    export LD_LIBRARY_PATH="/tools/pahole/lib:$LD_LIBRARY_PATH"
+    export PATH=/tools/pahole/bin:$PATH
+    export LD_LIBRARY_PATH=/tools/pahole/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 
 
 Configure ``.bashrc``

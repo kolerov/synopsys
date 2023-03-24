@@ -130,12 +130,12 @@ wsl.exe<span class="w"> </span>-d<span class="w"> </span>wsl-vpnkit<span class="
 <span class="nb">export</span><span class="w"> </span><span class="nv">BR2_DL_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$REPOS</span><span class="s2">/buildroot_dl&quot;</span>
 
 <span class="c1"># Elfutils</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;/tools/elfutils/bin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="s2">&quot;/tools/elfutils/lib:</span><span class="nv">$LD_LIBRARY_PATH</span><span class="s2">&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span>/tools/elfutils/bin:<span class="nv">$PATH</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span>/tools/elfutils/lib<span class="si">${</span><span class="nv">LD_LIBRARY_PATH</span><span class="p">:+:</span><span class="nv">$LD_LIBRARY_PATH</span><span class="si">}</span>
 
 <span class="c1"># Pahole</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;/tools/pahole/bin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="s2">&quot;/tools/pahole/lib:</span><span class="nv">$LD_LIBRARY_PATH</span><span class="s2">&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span>/tools/pahole/bin:<span class="nv">$PATH</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span>/tools/pahole/lib<span class="si">${</span><span class="nv">LD_LIBRARY_PATH</span><span class="p">:+:</span><span class="nv">$LD_LIBRARY_PATH</span><span class="si">}</span>
 </pre></div>
 </div>
 </section>
