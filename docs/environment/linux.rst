@@ -67,22 +67,20 @@ Configure ``.profile``
 
 .. code-block:: bash
 
-    # Enable networking through VPN
+    # Enable networking through VPN in WSL
     wsl.exe -d wsl-vpnkit service wsl-vpnkit start
-
-    export BASE_SCRATCH="/SCRATCH/ykolerov"
-    export BASE_YKOLEROV=""
-    export BASE="${BASE_YKOLEROV}"
-
+    
+    # Common places
+    export BASE=""
     export TOOLS="$BASE/tools"
     export REPOS="$BASE/repos"
 
     # Toolchain
-    export PATH="$TOOLS/arc64-elf/bin:$PATH"
     export PATH="$TOOLS/arc-elf32/bin:$PATH"
-    export PATH="$TOOLS/release-2022.09/arc-snps-linux-gnu/bin:$PATH"
-    export PATH="$TOOLS/release-2022.09/arc64-snps-linux-gnu/bin:$PATH"
-    export PATH="$TOOLS/release-2022.09/arc32-snps-linux-uclibc/bin:$PATH"
+    export PATH="$TOOLS/arc64-elf/bin:$PATH"
+    export PATH="$TOOLS/arc-linux-gnu/bin:$PATH"
+    export PATH="$TOOLS/arc32-linux-uclibc/bin:$PATH"
+    export PATH="$TOOLS/arc64-linux-gnu/bin:$PATH"
     export PATH="$TOOLS/i686-w64-mingw32/bin:$PATH"
     export PATH="$TOOLS/x86_64-w64-mingw32/bin:$PATH"
 
