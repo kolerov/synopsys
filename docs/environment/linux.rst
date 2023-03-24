@@ -141,16 +141,17 @@ Install Rust
 
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
-Elfutils
+Build and install elfutils
 --------
 
 .. code-block:: bash
 
     sudo dnf install libmicrohttpd libmicrohttpd-devel libsq3 libsq3-devel libarchive libarchive-devel gettext-devel
     git clone https://sourceware.org/git/elfutils.git
-    cd elfutils
     autoreconf -fi
-    ./configure --prefix=/tools/elfutils --enable-maintainer-mode
+    mkdir -p elfutils/build
+    cp elfutils/build
+    ../configure --prefix=/tools/elfutils --enable-maintainer-mode
     make
     make install
 
