@@ -58,7 +58,9 @@ Install all necessary packages for work and dependencies for building a toolchai
                      ninja-build nmap patch perl-Thread-Queue pixman-devel \
                      pulseaudio-libs-devel python3 rsync SDL2-devel \
                      screen snappy-devel systemtap-sdt-devel texinfo tmux \
-                     unzip vte291-devel wget which xz zlib-devel
+                     unzip vte291-devel wget which xz zlib-devel \
+                     libmicrohttpd libmicrohttpd-devel libsq3 libsq3-devel \
+                     libarchive libarchive-devel gettext-devel
 
 Configure ``.profile``
 ----------------------
