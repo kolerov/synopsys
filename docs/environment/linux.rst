@@ -34,22 +34,31 @@ Install packages for building a toolchain using Crosstool-NG or our scripts:
 Bootstrap Fedora 37
 -------------------
 
-Install common packages:
+Install main groups:
 
 .. code-block:: bash
 
     sudo dnf update
-    sudo dnf groupinstall "Development Tools" "Development Libraries"
-    sudo dnf install mercurial mc cmake tmux screen minicom htop nmap
+    sudo dnf groupinstall "Development Tools" \
+                          "Development Libraries" \
+                          "C Development Tools and Libraries"
 
-Install packages for building a toolchain using Crosstool-NG or our scripts:
+Install all necessary packages for work and dependencies for building a toolchain:
 
 .. code-block:: bash
 
-    sudo dnf install -y autoconf bison bzip2 diffutils file flex gcc-c++ git \
-                        gperf help2man libtool make ncurses-devel patch \
-                        perl-Thread-Queue python3 rsync texinfo unzip wget \
-                        which xz expat expat-devel dwarves
+    sudo dnf install autoconf bison brlapi-devel bzip2 capstone-devel cmake \
+                     curl-devel cyrus-sasl-devel diffutils dwarves expat \
+                     expat-devel file flex gcc-c++ git gperf gtk3-devel \
+                     help2man htop libaio-devel libattr-devel libcap-ng-devel \
+                     libfdt-devel libgcrypt-devel libibverbs-devel libiscsi-devel \
+                     libjpeg-devel libpng-devel librdmacm-devel libseccomp-devel \
+                     libssh-devel libtool libusbx-devel libuuid-devel lzo-devel \
+                     make mc mercurial minicom ncurses-devel nettle-devel \
+                     ninja-build nmap patch perl-Thread-Queue pixman-devel \
+                     pulseaudio-libs-devel python3 rsync SDL2-devel \
+                     screen snappy-devel systemtap-sdt-devel texinfo tmux \
+                     unzip vte291-devel wget which xz zlib-devel
 
 Configure ``.profile``
 ----------------------
