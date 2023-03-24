@@ -153,3 +153,23 @@ Elfutils
     ./configure --prefix=/tools/elfutils --enable-maintainer-mode
     make
     make install
+
+Build and install pahole
+------------------------
+
+.. warning::
+
+    We use here 1.23 version of Pahole because of this commit in the latest version:
+    
+      https://git.kernel.org/pub/scm/devel/pahole/pahole.git/commit/?id=9712d9ec929fb6b3595d2970bbbac8b0b1c10ead
+
+    It leads to generating BTF information for 64-bit enumerations. However, Linux kernels below 6.0 version
+    contain tools which don't support such BTF structures and crash while building the kernel. 
+
+.. code-block:: bash
+
+    git clone -b v1.23 https://git.kernel.org/pub/scm/devel/pahole/pahole.git
+    mkdir pahole/build
+    cd pahole/build
+    cmake -D__LIB=lib -DCMAKE_INSTALL_PREFIX=/tools/pahole ..
+    make install
