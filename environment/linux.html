@@ -54,6 +54,7 @@
 <li><p><a class="reference internal" href="#setup-git" id="id5">Setup Git</a></p></li>
 <li><p><a class="reference internal" href="#install-rust" id="id6">Install Rust</a></p></li>
 <li><p><a class="reference internal" href="#elfutils" id="id7">Elfutils</a></p></li>
+<li><p><a class="reference internal" href="#build-and-install-pahole" id="id8">Build and install pahole</a></p></li>
 </ul>
 </nav>
 <section id="bootstrap-ubuntu-22-04">
@@ -189,6 +190,25 @@ make<span class="w"> </span>install
 </pre></div>
 </div>
 </section>
+<section id="build-and-install-pahole">
+<h2><a class="toc-backref" href="#id8" role="doc-backlink">Build and install pahole</a><a class="headerlink" href="#build-and-install-pahole" title="Permalink to this heading">¶</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>We use here 1.23 version of Pahole because of this commit in the latest version:</p>
+<blockquote>
+<div><p><a class="reference external" href="https://git.kernel.org/pub/scm/devel/pahole/pahole.git/commit/?id=9712d9ec929fb6b3595d2970bbbac8b0b1c10ead">https://git.kernel.org/pub/scm/devel/pahole/pahole.git/commit/?id=9712d9ec929fb6b3595d2970bbbac8b0b1c10ead</a></p>
+</div></blockquote>
+<p>It leads to generating BTF information for 64-bit enumerations. However, Linux kernels below 6.0 version
+contain tools which don’t support such BTF structures and crash while building the kernel.</p>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>v1.23<span class="w"> </span>https://git.kernel.org/pub/scm/devel/pahole/pahole.git
+mkdir<span class="w"> </span>pahole/build
+<span class="nb">cd</span><span class="w"> </span>pahole/build
+cmake<span class="w"> </span>-D__LIB<span class="o">=</span>lib<span class="w"> </span>-DCMAKE_INSTALL_PREFIX<span class="o">=</span>/tools/pahole<span class="w"> </span>..
+make<span class="w"> </span>install
+</pre></div>
+</div>
+</section>
 </section>
 
 
@@ -209,6 +229,7 @@ make<span class="w"> </span>install
 <li><a class="reference internal" href="#setup-git">Setup Git</a></li>
 <li><a class="reference internal" href="#install-rust">Install Rust</a></li>
 <li><a class="reference internal" href="#elfutils">Elfutils</a></li>
+<li><a class="reference internal" href="#build-and-install-pahole">Build and install pahole</a></li>
 </ul>
 </li>
 </ul>
