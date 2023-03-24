@@ -60,7 +60,8 @@ Install all necessary packages for work and dependencies for building a toolchai
                      screen snappy-devel systemtap-sdt-devel texinfo tmux \
                      unzip vte291-devel wget which xz zlib-devel \
                      libmicrohttpd libmicrohttpd-devel libsq3 libsq3-devel \
-                     libarchive libarchive-devel gettext-devel
+                     libarchive libarchive-devel gettext-devel texlive \
+                     libmpc-devel mpfr-devel
 
 Configure ``.profile``
 ----------------------
