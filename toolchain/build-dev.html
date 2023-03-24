@@ -83,18 +83,11 @@ make<span class="w"> </span>install
 </section>
 <section id="build-linux-toolchain">
 <h2>Build Linux toolchain<a class="headerlink" href="#build-linux-toolchain" title="Permalink to this heading">¶</a></h2>
-<p>Prepare headers for ARCv2:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># For ARCv2</span>
-git<span class="w"> </span>clone<span class="w"> </span>https://github.com/torvalds/linux
-<span class="nb">cd</span><span class="w"> </span>linux
-git<span class="w"> </span>checkout<span class="w"> </span><span class="m">5</span>.16
-make<span class="w"> </span>headers_install<span class="w"> </span><span class="nv">ARCH</span><span class="o">=</span>arc<span class="w"> </span><span class="nv">CONFIG_ISA_ARCV2</span><span class="o">=</span>y<span class="w"> </span><span class="nv">CROSS_COMPILE</span><span class="o">=</span><span class="s2">&quot;arc-elf32-&quot;</span><span class="w"> </span><span class="nv">INSTALL_HDR_PATH</span><span class="o">=</span>/headers/path
-
-<span class="c1"># For ARCv3 (HS6x)</span>
-git<span class="w"> </span>clone<span class="w"> </span>https://github.com/foss-for-synopsys-dwc-arc-processors/linux
+<p>Prepare headers:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/foss-for-synopsys-dwc-arc-processors/linux
 <span class="nb">cd</span><span class="w"> </span>linux
 git<span class="w"> </span>checkout<span class="w"> </span>arc64
-make<span class="w"> </span>headers_install<span class="w"> </span><span class="nv">ARCH</span><span class="o">=</span>arc<span class="w"> </span><span class="nv">CONFIG_ISA_ARCV3</span><span class="o">=</span>y<span class="w"> </span><span class="nv">CROSS_COMPILE</span><span class="o">=</span><span class="s2">&quot;arc64-elf-&quot;</span><span class="w"> </span><span class="nv">INSTALL_HDR_PATH</span><span class="o">=</span>/headers/path
+make<span class="w"> </span>headers_install<span class="w"> </span><span class="nv">ARCH</span><span class="o">=</span>arc<span class="w"> </span><span class="nv">CROSS_COMPILE</span><span class="o">=</span><span class="s2">&quot;arc-elf32-&quot;</span><span class="w"> </span><span class="nv">INSTALL_HDR_PATH</span><span class="o">=</span>/repos/linux-headers-5.16
 </pre></div>
 </div>
 <p>Configure and build:</p>
