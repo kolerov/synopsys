@@ -44,37 +44,28 @@
             
   <section id="building-qemu">
 <h1>Building QEMU<a class="headerlink" href="#building-qemu" title="Permalink to this heading">¶</a></h1>
+<p>You can find a good tutorial for building QEMU in Wiki of the project: <a class="reference external" href="https://wiki.qemu.org/Hosts/Linux">https://wiki.qemu.org/Hosts/Linux</a>.</p>
 <section id="install-packages-for-ubuntu">
 <h2>Install packages for Ubuntu<a class="headerlink" href="#install-packages-for-ubuntu" title="Permalink to this heading">¶</a></h2>
-<p>You can find a good tutorial for building QEMU in Wiki of the project: <a class="reference external" href="https://wiki.qemu.org/Hosts/Linux">https://wiki.qemu.org/Hosts/Linux</a>.
-Here you can find a short variant of that tutorial for Ubuntu 20.04.</p>
-<p>First you need to install <code class="docutils literal notranslate"><span class="pre">git</span></code> and other required packages:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>git<span class="w"> </span>libglib2.0-dev<span class="w"> </span>libfdt-dev<span class="w"> </span>libpixman-1-dev<span class="w"> </span>zlib1g-dev<span class="w"> </span>ninja-build
-</pre></div>
-</div>
-<p>Then install additional packages for better features coverage:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>git-email<span class="w"> </span>libaio-dev<span class="w"> </span>libbluetooth-dev<span class="w"> </span>libcapstone-dev<span class="w"> </span>libbrlapi-dev<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>libbz2-dev<span class="w"> </span>libcap-ng-dev<span class="w"> </span>libcurl4-gnutls-dev<span class="w"> </span>libgtk-3-dev<span class="w"> </span>libibverbs-dev<span class="w"> </span>libjpeg8-dev<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>libncurses5-dev<span class="w"> </span>libnuma-dev<span class="w"> </span>librbd-dev<span class="w"> </span>librdmacm-dev<span class="w"> </span>libsasl2-dev<span class="w"> </span>libsdl2-dev<span class="w"> </span>libseccomp-dev<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>libsnappy-dev<span class="w"> </span>libssh-dev<span class="w"> </span>libvde-dev<span class="w"> </span>libvdeplug-dev<span class="w"> </span>libvte-2.91-dev<span class="w"> </span>libxen-dev<span class="w"> </span>liblzo2-dev<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>valgrind<span class="w"> </span>xfslibs-dev
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>git<span class="w"> </span>libglib2.0-dev<span class="w"> </span>libfdt-dev<span class="w"> </span>libpixman-1-dev<span class="w"> </span>zlib1g-dev<span class="w"> </span>ninja-build<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>git-email<span class="w"> </span>libaio-dev<span class="w"> </span>libbluetooth-dev<span class="w"> </span>libcapstone-dev<span class="w"> </span>libbrlapi-dev<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>libbz2-dev<span class="w"> </span>libcap-ng-dev<span class="w"> </span>libcurl4-gnutls-dev<span class="w"> </span>libgtk-3-dev<span class="w"> </span>libibverbs-dev<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>libjpeg8-dev<span class="w"> </span>libncurses5-dev<span class="w"> </span>libnuma-dev<span class="w"> </span>librbd-dev<span class="w"> </span>librdmacm-dev<span class="w"> </span>libsasl2-dev<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>libsdl2-dev<span class="w"> </span>libseccomp-dev<span class="w"> </span>libsnappy-dev<span class="w"> </span>libssh-dev<span class="w"> </span>libvde-dev<span class="w"> </span>libvdeplug-dev<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>libvte-2.91-dev<span class="w"> </span>libxen-dev<span class="w"> </span>liblzo2-dev<span class="w"> </span>valgrind<span class="w"> </span>xfslibs-dev
 </pre></div>
 </div>
 </section>
 <section id="install-packages-for-fedora">
 <h2>Install packages for Fedora<a class="headerlink" href="#install-packages-for-fedora" title="Permalink to this heading">¶</a></h2>
-<p>First you need to install <code class="docutils literal notranslate"><span class="pre">git</span></code> and other required packages:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>dnf<span class="w"> </span>install<span class="w"> </span>git<span class="w"> </span>glib2-devel<span class="w"> </span>libfdt-devel<span class="w"> </span>pixman-devel<span class="w"> </span>zlib-devel<span class="w"> </span>bzip2<span class="w"> </span>ninja-build<span class="w"> </span>python3
-</pre></div>
-</div>
-<p>Then install additional packages for better features coverage:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>dnf<span class="w"> </span>install<span class="w"> </span>libaio-devel<span class="w"> </span>libcap-ng-devel<span class="w"> </span>libiscsi-devel<span class="w"> </span>capstone-devel<span class="w"> </span><span class="se">\</span>
-<span class="w">                </span>gtk3-devel<span class="w"> </span>SDL2-devel<span class="w"> </span>vte291-devel<span class="w"> </span>ncurses-devel<span class="w"> </span><span class="se">\</span>
-<span class="w">                </span>libseccomp-devel<span class="w"> </span>nettle-devel<span class="w"> </span>libattr-devel<span class="w"> </span>libjpeg-devel<span class="w"> </span><span class="se">\</span>
-<span class="w">                </span>brlapi-devel<span class="w"> </span>libgcrypt-devel<span class="w"> </span>lzo-devel<span class="w"> </span>snappy-devel<span class="w"> </span><span class="se">\</span>
-<span class="w">                </span>librdmacm-devel<span class="w"> </span>libibverbs-devel<span class="w"> </span>cyrus-sasl-devel<span class="w"> </span>libpng-devel<span class="w"> </span><span class="se">\</span>
-<span class="w">                </span>libuuid-devel<span class="w"> </span>pulseaudio-libs-devel<span class="w"> </span>curl-devel<span class="w"> </span>libssh-devel<span class="w"> </span><span class="se">\</span>
-<span class="w">                </span>systemtap-sdt-devel<span class="w"> </span>libusbx-devel
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>dnf<span class="w"> </span>install<span class="w"> </span>git<span class="w"> </span>glib2-devel<span class="w"> </span>libfdt-devel<span class="w"> </span>pixman-devel<span class="w"> </span>zlib-devel<span class="w"> </span>bzip2<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>ninja-build<span class="w"> </span>python3libaio-devel<span class="w"> </span>libcap-ng-devel<span class="w"> </span>libiscsi-devel<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>capstone-devel<span class="w"> </span>gtk3-devel<span class="w"> </span>SDL2-devel<span class="w"> </span>vte291-devel<span class="w"> </span>ncurses-devel<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>libseccomp-devel<span class="w"> </span>nettle-devel<span class="w"> </span>libattr-devel<span class="w"> </span>libjpeg-devel<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>brlapi-devel<span class="w"> </span>libgcrypt-devel<span class="w"> </span>lzo-devel<span class="w"> </span>snappy-devel<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>librdmacm-devel<span class="w"> </span>libibverbs-devel<span class="w"> </span>cyrus-sasl-devel<span class="w"> </span>libpng-devel<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>libuuid-devel<span class="w"> </span>pulseaudio-libs-devel<span class="w"> </span>curl-devel<span class="w"> </span>libssh-devel<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>systemtap-sdt-devel<span class="w"> </span>libusbx-devel
 </pre></div>
 </div>
 </section>
