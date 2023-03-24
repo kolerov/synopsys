@@ -49,7 +49,7 @@ Install packages for building a toolchain using Crosstool-NG or our scripts:
     sudo dnf install -y autoconf bison bzip2 diffutils file flex gcc-c++ git \
                         gperf help2man libtool make ncurses-devel patch \
                         perl-Thread-Queue python3 rsync texinfo unzip wget \
-                        which xz expat expat-devel pahole
+                        which xz expat expat-devel dwarves
 
 Configure ``.profile``
 ----------------------
