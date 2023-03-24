@@ -75,7 +75,8 @@
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/foss-for-synopsys-dwc-arc-processors/qemu
 mkdir<span class="w"> </span>qemu_build
 <span class="nb">cd</span><span class="w"> </span>qemu_build
-../qemu/configure<span class="w"> </span>--target-list<span class="o">=</span>arc-softmmu,arc64-softmmu,arc-linux-user,arc64-linux-user<span class="w"> </span>--enable-debug<span class="w"> </span>--enable-debug-tcg<span class="w"> </span>--prefix<span class="o">=</span>/home/ykolerov/tools/qemu
+../qemu/configure<span class="w"> </span>--target-list<span class="o">=</span>arc-softmmu,arc64-softmmu,arc-linux-user,arc64-linux-user<span class="w"> </span><span class="se">\</span>
+<span class="w">                  </span>--enable-debug<span class="w"> </span>--enable-debug-tcg<span class="w"> </span>--prefix<span class="o">=</span>/home/ykolerov/tools/qemu
 make<span class="w"> </span>-j<span class="w"> </span><span class="k">$(</span>nproc<span class="k">)</span>
 make<span class="w"> </span>install
 </pre></div>
