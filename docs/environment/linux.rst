@@ -61,7 +61,8 @@ Install all necessary packages for work and dependencies for building a toolchai
                      unzip vte291-devel wget which xz zlib-devel \
                      libmicrohttpd libmicrohttpd-devel libsq3 libsq3-devel \
                      libarchive libarchive-devel gettext-devel texlive \
-                     libmpc-devel mpfr-devel
+                     libmpc-devel mpfr-devel clang clang-devel llvm llvm-devel \
+                     llvm-static
 
 Configure ``.profile``
 ----------------------
