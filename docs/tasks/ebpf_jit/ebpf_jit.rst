@@ -18,7 +18,7 @@ Generate and setup OpenSSH keys
 Generate keys (use your own home path)::
 
     $ mkdir ~/.ssh/keys
-    $ ssh-keygen -t rsa -C "ebpf@jit"
+    $ ssh-keygen -t rsa -C "arc@synopsys"
     Generating public/private rsa key pair.
     Enter file in which to save the key (/home/ykolerov/.ssh/id_rsa): /home/ykolerov/.ssh/keys/arc
     Enter passphrase (empty for no passphrase): 
