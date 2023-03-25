@@ -149,7 +149,7 @@ Save this configuration as ``ebpf_defconfig``:
     BR2_PACKAGE_BPFTOOL=y
     BR2_PACKAGE_ELFUTILS=y
 
-Build a Buildroot configuration file and the build ``rootfs.cpio``:
+Build a Buildroot configuration file and then build ``rootfs.cpio``:
 
 .. code-block:: bash
 
