@@ -148,6 +148,8 @@ Install Rust
 Build and install elfutils
 --------
 
+Build and install:
+
 .. code-block:: bash
 
     sudo dnf install libmicrohttpd libmicrohttpd-devel libsq3 libsq3-devel libarchive libarchive-devel gettext-devel
@@ -158,6 +160,13 @@ Build and install elfutils
     ../configure --prefix=/tools/elfutils --enable-maintainer-mode
     make
     make install
+
+Configure your environment:
+
+.. code-block:: bash
+
+    export PATH=/tools/elfutils/bin:$PATH
+    export LD_LIBRARY_PATH=/tools/elfutils/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 
 Build and install pahole
 ------------------------
@@ -178,3 +187,10 @@ Build and install pahole
     cd pahole/build
     cmake -D__LIB=lib -DCMAKE_INSTALL_PREFIX=/tools/pahole ..
     make install
+
+Configure your environment:
+
+.. code-block:: bash
+
+    export PATH=/tools/pahole/bin:$PATH
+    export LD_LIBRARY_PATH=/tools/pahole/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
