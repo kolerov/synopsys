@@ -46,62 +46,28 @@
 <h1>🟡 eBPF in Linux for ARC<a class="headerlink" href="#ebpf-in-linux-for-arc" title="Permalink to this heading">¶</a></h1>
 <nav class="contents local" id="contents">
 <ul class="simple">
-<li><p><a class="reference internal" href="#build-and-install-elfutils" id="id5">Build and install elfutils</a></p></li>
-<li><p><a class="reference internal" href="#build-and-install-pahole" id="id6">Build and install Pahole</a></p></li>
-<li><p><a class="reference internal" href="#generate-and-setup-openssh-keys" id="id7">Generate and setup OpenSSH keys</a></p></li>
-<li><p><a class="reference internal" href="#building-rootfs-cpio" id="id8">Building <code class="docutils literal notranslate"><span class="pre">rootfs.cpio</span></code></a></p></li>
-<li><p><a class="reference internal" href="#building-a-linux-kernel" id="id9">Building a Linux kernel</a></p></li>
-<li><p><a class="reference internal" href="#workaround-for-complex-float-error" id="id10">Workaround for <code class="docutils literal notranslate"><span class="pre">complex</span> <span class="pre">float</span></code> error</a></p></li>
-<li><p><a class="reference internal" href="#booting" id="id11">Booting</a></p></li>
-<li><p><a class="reference internal" href="#run-ebpf-tests" id="id12">Run eBPF tests</a></p></li>
-<li><p><a class="reference internal" href="#analyzing-dumps" id="id13">Analyzing dumps</a></p></li>
-<li><p><a class="reference internal" href="#build-a-simple-bpf-application" id="id14">Build a simple BPF application</a></p></li>
+<li><p><a class="reference internal" href="#build-and-install-elfutils-and-pahole" id="id5">Build and install elfutils and pahole</a></p></li>
+<li><p><a class="reference internal" href="#generate-and-setup-openssh-keys" id="id6">Generate and setup OpenSSH keys</a></p></li>
+<li><p><a class="reference internal" href="#building-rootfs-cpio" id="id7">Building <code class="docutils literal notranslate"><span class="pre">rootfs.cpio</span></code></a></p></li>
+<li><p><a class="reference internal" href="#building-a-linux-kernel" id="id8">Building a Linux kernel</a></p></li>
+<li><p><a class="reference internal" href="#workaround-for-complex-float-error" id="id9">Workaround for <code class="docutils literal notranslate"><span class="pre">complex</span> <span class="pre">float</span></code> error</a></p></li>
+<li><p><a class="reference internal" href="#booting" id="id10">Booting</a></p></li>
+<li><p><a class="reference internal" href="#run-ebpf-tests" id="id11">Run eBPF tests</a></p></li>
+<li><p><a class="reference internal" href="#analyzing-dumps" id="id12">Analyzing dumps</a></p></li>
+<li><p><a class="reference internal" href="#build-a-simple-bpf-application" id="id13">Build a simple BPF application</a></p></li>
 </ul>
 </nav>
-<section id="build-and-install-elfutils">
-<h2><a class="toc-backref" href="#id5" role="doc-backlink">Build and install elfutils</a><a class="headerlink" href="#build-and-install-elfutils" title="Permalink to this heading">¶</a></h2>
-<p>Build elfutils (use your own path for prefix):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>elfutils-0.189<span class="w"> </span>https://sourceware.org/git/elfutils.git
-<span class="nb">cd</span><span class="w"> </span>elfutils
-autoreconf<span class="w"> </span>-fi
-./configure<span class="w"> </span>--prefix<span class="o">=</span>/tools/elfutils<span class="w"> </span>--enable-maintainer-mode
-make<span class="w"> </span>-j<span class="w"> </span><span class="k">$(</span>nproc<span class="k">)</span>
-make<span class="w"> </span>install
-</pre></div>
-</div>
-<p>Configure your environment:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span>/tools/elfutils/bin:<span class="nv">$PATH</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span>/tools/elfutils/lib<span class="si">${</span><span class="nv">LD_LIBRARY_PATH</span><span class="p">:+:</span><span class="nv">$LD_LIBRARY_PATH</span><span class="si">}</span>
-</pre></div>
-</div>
-</section>
-<section id="build-and-install-pahole">
-<h2><a class="toc-backref" href="#id6" role="doc-backlink">Build and install Pahole</a><a class="headerlink" href="#build-and-install-pahole" title="Permalink to this heading">¶</a></h2>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>We use here 1.23 version of Pahole because of this commit in the latest version:</p>
-<blockquote>
-<div><p><a class="reference external" href="https://git.kernel.org/pub/scm/devel/pahole/pahole.git/commit/?id=9712d9ec929fb6b3595d2970bbbac8b0b1c10ead">https://git.kernel.org/pub/scm/devel/pahole/pahole.git/commit/?id=9712d9ec929fb6b3595d2970bbbac8b0b1c10ead</a></p>
-</div></blockquote>
-<p>It leads to generating BTF information for 64-bit enumerations. However, Linux kernels below 6.0 version
-contain tools which don’t support such BTF structures and crash while building the kernel.</p>
-</div>
-<p>Build Pahole (use your own path for prefix):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>v1.23<span class="w"> </span>https://git.kernel.org/pub/scm/devel/pahole/pahole.git
-mkdir<span class="w"> </span>pahole/build
-<span class="nb">cd</span><span class="w"> </span>pahole/build
-cmake<span class="w"> </span>-D__LIB<span class="o">=</span>lib<span class="w"> </span>-DCMAKE_INSTALL_PREFIX<span class="o">=</span>/tools/pahole<span class="w"> </span>..
-make<span class="w"> </span>install
-</pre></div>
-</div>
-<p>Configure your environment:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span>/tools/pahole/bin:<span class="nv">$PATH</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span>/tools/pahole/lib<span class="si">${</span><span class="nv">LD_LIBRARY_PATH</span><span class="p">:+:</span><span class="nv">$LD_LIBRARY_PATH</span><span class="si">}</span>
-</pre></div>
-</div>
+<section id="build-and-install-elfutils-and-pahole">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Build and install elfutils and pahole</a><a class="headerlink" href="#build-and-install-elfutils-and-pahole" title="Permalink to this heading">¶</a></h2>
+<p>Build and install custom elfutils and pahole for your host system
+according to these instructions:</p>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="../../environment/linux.html#build-elfutils"><span class="std std-ref">Build and install elfutils</span></a></p></li>
+<li><p><a class="reference internal" href="../../environment/linux.html#build-pahole"><span class="std std-ref">Build and install pahole</span></a></p></li>
+</ol>
 </section>
 <section id="generate-and-setup-openssh-keys">
-<h2><a class="toc-backref" href="#id7" role="doc-backlink">Generate and setup OpenSSH keys</a><a class="headerlink" href="#generate-and-setup-openssh-keys" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">Generate and setup OpenSSH keys</a><a class="headerlink" href="#generate-and-setup-openssh-keys" title="Permalink to this heading">¶</a></h2>
 <p>Generate keys (use your own home path):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mkdir ~/.ssh/keys
 $ ssh-keygen -t rsa -C &quot;ebpf@jit&quot;
@@ -123,7 +89,7 @@ Your public key has been saved in /home/ykolerov/.ssh/keys/arc.pub
 </div>
 </section>
 <section id="building-rootfs-cpio">
-<h2><a class="toc-backref" href="#id8" role="doc-backlink">Building <code class="docutils literal notranslate"><span class="pre">rootfs.cpio</span></code></a><a class="headerlink" href="#building-rootfs-cpio" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">Building <code class="docutils literal notranslate"><span class="pre">rootfs.cpio</span></code></a><a class="headerlink" href="#building-rootfs-cpio" title="Permalink to this heading">¶</a></h2>
 <p>Clone Buildroot from upstream repository and create a build directory:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://git.buildroot.net/buildroot
 mkdir<span class="w"> </span>buildroot/build
@@ -237,7 +203,7 @@ make<span class="w"> </span>-j<span class="w"> </span><span class="k">$(</span>n
 </div>
 </section>
 <section id="building-a-linux-kernel">
-<h2><a class="toc-backref" href="#id9" role="doc-backlink">Building a Linux kernel</a><a class="headerlink" href="#building-a-linux-kernel" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id8" role="doc-backlink">Building a Linux kernel</a><a class="headerlink" href="#building-a-linux-kernel" title="Permalink to this heading">¶</a></h2>
 <p>Retrieve sources of the Linux kernel with latest changes for eBPF JIT:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>shahab-bpf-jit<span class="w"> </span>https://github.com/foss-for-synopsys-dwc-arc-processors/linux
 mkdir<span class="w"> </span>linux/build
@@ -360,7 +326,7 @@ make<span class="w"> </span>-j<span class="w"> </span><span class="k">$(</span>n
 </div>
 </section>
 <section id="workaround-for-complex-float-error">
-<h2><a class="toc-backref" href="#id10" role="doc-backlink">Workaround for <code class="docutils literal notranslate"><span class="pre">complex</span> <span class="pre">float</span></code> error</a><a class="headerlink" href="#workaround-for-complex-float-error" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id9" role="doc-backlink">Workaround for <code class="docutils literal notranslate"><span class="pre">complex</span> <span class="pre">float</span></code> error</a><a class="headerlink" href="#workaround-for-complex-float-error" title="Permalink to this heading">¶</a></h2>
 <p>ARC toolchains generate <code class="docutils literal notranslate"><span class="pre">complex</span> <span class="pre">float</span></code> DIE entries in <code class="docutils literal notranslate"><span class="pre">libgcc</span></code>.
 At the moment such entries are not yet handled by pahole.
 So, it’s necessary to disable BTF floats.</p>
@@ -383,7 +349,7 @@ can apply this patch (<a class="reference external" href="https://github.com/fos
 </div>
 </section>
 <section id="booting">
-<h2><a class="toc-backref" href="#id11" role="doc-backlink">Booting</a><a class="headerlink" href="#booting" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id10" role="doc-backlink">Booting</a><a class="headerlink" href="#booting" title="Permalink to this heading">¶</a></h2>
 <p>Create a directory <code class="docutils literal notranslate"><span class="pre">boot</span></code> with this <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>:</p>
 <div class="highlight-Makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">LNXIMG</span><span class="w">  </span><span class="o">:=</span><span class="w"> </span>../linux/build/vmlinux
 
@@ -442,7 +408,7 @@ can apply this patch (<a class="reference external" href="https://github.com/fos
 <p>Just run <code class="docutils literal notranslate"><span class="pre">make</span></code> adn QEMU will boot.</p>
 </section>
 <section id="run-ebpf-tests">
-<h2><a class="toc-backref" href="#id12" role="doc-backlink">Run eBPF tests</a><a class="headerlink" href="#run-ebpf-tests" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id11" role="doc-backlink">Run eBPF tests</a><a class="headerlink" href="#run-ebpf-tests" title="Permalink to this heading">¶</a></h2>
 <p>On host system:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ssh<span class="w"> </span>arc<span class="w"> </span><span class="s2">&quot;mount -t debugfs debugfs /sys/kernel/debug&quot;</span>
 ssh<span class="w"> </span>arc<span class="w"> </span><span class="s2">&quot;sysctl net.core.bpf_jit_enable=1&quot;</span>
@@ -455,7 +421,7 @@ rsync<span class="w"> </span>../linux/build/lib/test_bpf.ko<span class="w"> </sp
 </div>
 </section>
 <section id="analyzing-dumps">
-<h2><a class="toc-backref" href="#id13" role="doc-backlink">Analyzing dumps</a><a class="headerlink" href="#analyzing-dumps" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id12" role="doc-backlink">Analyzing dumps</a><a class="headerlink" href="#analyzing-dumps" title="Permalink to this heading">¶</a></h2>
 <p>Create a directory <code class="docutils literal notranslate"><span class="pre">dump</span></code> with this <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>:</p>
 <div class="highlight-Makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">INSDIR</span><span class="w">  </span><span class="o">:=</span><span class="w"> </span>/tools/arc-linux-gnu
 
@@ -487,7 +453,7 @@ rsync<span class="w"> </span>../linux/build/lib/test_bpf.ko<span class="w"> </sp
 to get assembler code.</p>
 </section>
 <section id="build-a-simple-bpf-application">
-<h2><a class="toc-backref" href="#id14" role="doc-backlink">Build a simple BPF application</a><a class="headerlink" href="#build-a-simple-bpf-application" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id13" role="doc-backlink">Build a simple BPF application</a><a class="headerlink" href="#build-a-simple-bpf-application" title="Permalink to this heading">¶</a></h2>
 <p>Generate <code class="docutils literal notranslate"><span class="pre">vmlinux.h</span></code> file from <code class="docutils literal notranslate"><span class="pre">vmlinux</span></code> image, copy all necessary libraries and headers:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>include/bpf
 bpftool<span class="w"> </span>--debug<span class="w"> </span>btf<span class="w"> </span>dump<span class="w"> </span>file<span class="w"> </span>../linux/build/vmlinux<span class="w"> </span>format<span class="w"> </span>c<span class="w"> </span>&gt;<span class="w"> </span>include/vmlinux.h
@@ -538,8 +504,7 @@ rsync<span class="w"> </span>minimal<span class="w"> </span>arc:
     <h3><a href="../../index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">🟡 eBPF in Linux for ARC</a><ul>
-<li><a class="reference internal" href="#build-and-install-elfutils">Build and install elfutils</a></li>
-<li><a class="reference internal" href="#build-and-install-pahole">Build and install Pahole</a></li>
+<li><a class="reference internal" href="#build-and-install-elfutils-and-pahole">Build and install elfutils and pahole</a></li>
 <li><a class="reference internal" href="#generate-and-setup-openssh-keys">Generate and setup OpenSSH keys</a></li>
 <li><a class="reference internal" href="#building-rootfs-cpio">Building <code class="docutils literal notranslate"><span class="pre">rootfs.cpio</span></code></a></li>
 <li><a class="reference internal" href="#building-a-linux-kernel">Building a Linux kernel</a></li>

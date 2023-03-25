@@ -3,55 +3,14 @@
 
 .. contents:: :local:
 
-Build and install elfutils
---------------------------
+Build and install elfutils and pahole
+-------------------------------------
 
-Build elfutils (use your own path for prefix):
+Build and install custom elfutils and pahole for your host system
+according to these instructions:
 
-.. code-block:: bash
-
-    git clone -b elfutils-0.189 https://sourceware.org/git/elfutils.git
-    cd elfutils
-    autoreconf -fi
-    ./configure --prefix=/tools/elfutils --enable-maintainer-mode
-    make -j $(nproc)
-    make install
-
-Configure your environment:
-
-.. code-block:: bash
-
-    export PATH=/tools/elfutils/bin:$PATH
-    export LD_LIBRARY_PATH=/tools/elfutils/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
-
-Build and install Pahole
-------------------------
-
-.. warning::
-
-    We use here 1.23 version of Pahole because of this commit in the latest version:
-    
-      https://git.kernel.org/pub/scm/devel/pahole/pahole.git/commit/?id=9712d9ec929fb6b3595d2970bbbac8b0b1c10ead
-
-    It leads to generating BTF information for 64-bit enumerations. However, Linux kernels below 6.0 version
-    contain tools which don't support such BTF structures and crash while building the kernel. 
-
-Build Pahole (use your own path for prefix):
-
-.. code-block:: bash
-
-    git clone -b v1.23 https://git.kernel.org/pub/scm/devel/pahole/pahole.git
-    mkdir pahole/build
-    cd pahole/build
-    cmake -D__LIB=lib -DCMAKE_INSTALL_PREFIX=/tools/pahole ..
-    make install
-
-Configure your environment:
-
-.. code-block:: bash
-
-    export PATH=/tools/pahole/bin:$PATH
-    export LD_LIBRARY_PATH=/tools/pahole/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+1. :ref:`build-elfutils`
+2. :ref:`build-pahole`
 
 Generate and setup OpenSSH keys
 -------------------------------
