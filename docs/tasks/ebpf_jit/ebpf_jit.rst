@@ -167,6 +167,12 @@ Retrieve sources of the Linux kernel with latest changes for eBPF JIT:
     mkdir linux/build
     cd linux/build
 
+Also, you can create a separate working tree from existing Linux repository:
+
+.. code-block:: bash
+
+    git worktree add --track -b ykolerov-bpf-jit /home/ykolerov/tasks/ebpf/linux origin/shahab-bpf-jit
+
 Change ``kernel/bpf/Makefile`` to prevent some build errors:
 
 .. code-block:: diff
