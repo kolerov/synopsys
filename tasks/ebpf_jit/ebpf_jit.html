@@ -69,8 +69,8 @@ according to these instructions:</p>
 <section id="generate-and-setup-openssh-keys">
 <h2><a class="toc-backref" href="#id6" role="doc-backlink">Generate and setup OpenSSH keys</a><a class="headerlink" href="#generate-and-setup-openssh-keys" title="Permalink to this heading">¶</a></h2>
 <p>Generate keys (use your own home path):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mkdir ~/.ssh/keys
-$ ssh-keygen -t rsa -C &quot;ebpf@jit&quot;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mkdir -p ~/.ssh/keys
+$ ssh-keygen -t rsa -C &quot;arc@synopsys&quot;
 Generating public/private rsa key pair.
 Enter file in which to save the key (/home/ykolerov/.ssh/id_rsa): /home/ykolerov/.ssh/keys/arc
 Enter passphrase (empty for no passphrase):
@@ -196,7 +196,7 @@ BR2_PACKAGE_ELFUTILS<span class="s">=y</span>
 </pre></div>
 </div>
 </div>
-<p>Build a Buildroot configuration file and the build <code class="docutils literal notranslate"><span class="pre">rootfs.cpio</span></code>:</p>
+<p>Build a Buildroot configuration file and then build <code class="docutils literal notranslate"><span class="pre">rootfs.cpio</span></code>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>-C<span class="w"> </span>..<span class="w"> </span><span class="nv">O</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="w"> </span>defconfig<span class="w"> </span><span class="nv">BR2_DEFCONFIG</span><span class="o">=</span>build/ebpf_defconfig
 make<span class="w"> </span>-j<span class="w"> </span><span class="k">$(</span>nproc<span class="k">)</span>
 </pre></div>
@@ -208,6 +208,10 @@ make<span class="w"> </span>-j<span class="w"> </span><span class="k">$(</span>n
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>shahab-bpf-jit<span class="w"> </span>https://github.com/foss-for-synopsys-dwc-arc-processors/linux
 mkdir<span class="w"> </span>linux/build
 <span class="nb">cd</span><span class="w"> </span>linux/build
+</pre></div>
+</div>
+<p>Also, you can create a separate working tree from existing Linux repository:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>worktree<span class="w"> </span>add<span class="w"> </span>--track<span class="w"> </span>-b<span class="w"> </span>ykolerov-bpf-jit<span class="w"> </span>/home/ykolerov/tasks/ebpf/linux<span class="w"> </span>origin/shahab-bpf-jit
 </pre></div>
 </div>
 <p>Change <code class="docutils literal notranslate"><span class="pre">kernel/bpf/Makefile</span></code> to prevent some build errors:</p>

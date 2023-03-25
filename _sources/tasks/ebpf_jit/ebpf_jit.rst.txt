@@ -17,8 +17,8 @@ Generate and setup OpenSSH keys
 
 Generate keys (use your own home path)::
 
-    $ mkdir ~/.ssh/keys
-    $ ssh-keygen -t rsa -C "ebpf@jit"
+    $ mkdir -p ~/.ssh/keys
+    $ ssh-keygen -t rsa -C "arc@synopsys"
     Generating public/private rsa key pair.
     Enter file in which to save the key (/home/ykolerov/.ssh/id_rsa): /home/ykolerov/.ssh/keys/arc
     Enter passphrase (empty for no passphrase): 
@@ -149,7 +149,7 @@ Save this configuration as ``ebpf_defconfig``:
     BR2_PACKAGE_BPFTOOL=y
     BR2_PACKAGE_ELFUTILS=y
 
-Build a Buildroot configuration file and the build ``rootfs.cpio``:
+Build a Buildroot configuration file and then build ``rootfs.cpio``:
 
 .. code-block:: bash
 
@@ -166,6 +166,12 @@ Retrieve sources of the Linux kernel with latest changes for eBPF JIT:
     git clone -b shahab-bpf-jit https://github.com/foss-for-synopsys-dwc-arc-processors/linux
     mkdir linux/build
     cd linux/build
+
+Also, you can create a separate working tree from existing Linux repository:
+
+.. code-block:: bash
+
+    git worktree add --track -b ykolerov-bpf-jit /home/ykolerov/tasks/ebpf/linux origin/shahab-bpf-jit
 
 Change ``kernel/bpf/Makefile`` to prevent some build errors:
 
