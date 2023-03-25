@@ -145,6 +145,8 @@ Install Rust
 
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
+.. _build-elfutils:
+
 Build and install elfutils
 --------------------------
 
@@ -167,6 +169,8 @@ Configure your environment:
 
     export PATH=/tools/elfutils/bin:$PATH
     export LD_LIBRARY_PATH=/tools/elfutils/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+
+.. _build-pahole:
 
 Build and install pahole
 ------------------------
