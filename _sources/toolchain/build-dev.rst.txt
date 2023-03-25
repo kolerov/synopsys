@@ -54,7 +54,9 @@ Prepare headers:
     git clone https://github.com/foss-for-synopsys-dwc-arc-processors/linux
     cd linux
     git checkout arc64
+    make mrproper
     make headers_install ARCH=arc CROSS_COMPILE="arc-elf32-" INSTALL_HDR_PATH=/repos/linux-headers-5.16
+    make mrproper
 
 Configure and build:
 

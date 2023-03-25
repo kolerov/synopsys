@@ -87,7 +87,9 @@ make<span class="w"> </span>install
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/foss-for-synopsys-dwc-arc-processors/linux
 <span class="nb">cd</span><span class="w"> </span>linux
 git<span class="w"> </span>checkout<span class="w"> </span>arc64
+make<span class="w"> </span>mrproper
 make<span class="w"> </span>headers_install<span class="w"> </span><span class="nv">ARCH</span><span class="o">=</span>arc<span class="w"> </span><span class="nv">CROSS_COMPILE</span><span class="o">=</span><span class="s2">&quot;arc-elf32-&quot;</span><span class="w"> </span><span class="nv">INSTALL_HDR_PATH</span><span class="o">=</span>/repos/linux-headers-5.16
+make<span class="w"> </span>mrproper
 </pre></div>
 </div>
 <p>Configure and build:</p>
