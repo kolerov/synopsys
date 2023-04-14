@@ -6,3 +6,4 @@ GNU Toolchain
 
    build-dev.rst
    build-prod.rst
+   eclipse.rst
