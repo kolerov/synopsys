@@ -45,13 +45,13 @@
   <section id="git">
 <h1>Git<a class="headerlink" href="#git" title="Permalink to this heading">¶</a></h1>
 <section id="compare-branches">
-<h2>Compare branches<a class="headerlink" href="#compare-branches" title="Permalink to this heading">¶</a></h2>
+<h2>Compare Branches<a class="headerlink" href="#compare-branches" title="Permalink to this heading">¶</a></h2>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>log<span class="w"> </span>--oneline<span class="w"> </span>--graph<span class="w"> </span>--decorate<span class="w"> </span>--abbrev-commit<span class="w">  </span>v5.18..synopsys/shahab-bpf-jit
 </pre></div>
 </div>
 </section>
 <section id="create-a-branch-from-remote">
-<h2>Create a branch from remote<a class="headerlink" href="#create-a-branch-from-remote" title="Permalink to this heading">¶</a></h2>
+<h2>Create a Branch from Remote<a class="headerlink" href="#create-a-branch-from-remote" title="Permalink to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">switch</span></code> was added in Git 2.23:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>switch<span class="w"> </span>-c<span class="w"> </span><span class="nb">test</span><span class="w"> </span>origin/test
 </pre></div>
@@ -62,7 +62,7 @@
 </div>
 </section>
 <section id="bisect-code">
-<h2>Bisect code<a class="headerlink" href="#bisect-code" title="Permalink to this heading">¶</a></h2>
+<h2>Bisect Code<a class="headerlink" href="#bisect-code" title="Permalink to this heading">¶</a></h2>
 <p>As an example, suppose you are trying to find the commit that broke a feature
 that was known to work in version <cite>v2.6.13-rc2`</cite> of your project. You start a
 bisect session as follows:</p>
@@ -71,7 +71,34 @@ git<span class="w"> </span>bisect<span class="w"> </span>bad<span class="w">    
 git<span class="w"> </span>bisect<span class="w"> </span>good<span class="w"> </span>v2.6.13-rc2<span class="w">    </span><span class="c1"># v2.6.13-rc2 is known to be good</span>
 </pre></div>
 </div>
-<p>See details here: <a class="reference external" href="https://git-scm.com/docs/git-bisect">https://git-scm.com/docs/git-bisect</a>.</p>
+<p>See details here:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://git-scm.com/docs/git-bisect">https://git-scm.com/docs/git-bisect</a></p></li>
+</ul>
+</section>
+<section id="how-to-delete-a-git-branch-both-locally-and-remotely">
+<h2>How to Delete a Git Branch Both Locally and Remotely<a class="headerlink" href="#how-to-delete-a-git-branch-both-locally-and-remotely" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># The -d option will delete the branch only if it has</span>
+<span class="c1"># already been pushed and merged with the remote branch.</span>
+git<span class="w"> </span>branch<span class="w"> </span>-d<span class="w"> </span>localBranchName
+
+<span class="c1"># Use -D instead if you want to force the branch to be</span>
+<span class="c1"># deleted, even if it hasn&#39;t been pushed or merged yet.</span>
+git<span class="w"> </span>branch<span class="w"> </span>-D<span class="w"> </span>localBranchName
+
+<span class="c1"># Delete branch remotely.</span>
+git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>--delete<span class="w"> </span>remoteBranchName
+
+<span class="c1"># Try to synchronize your branch list using -p. The -p</span>
+<span class="c1"># flag means &quot;prune&quot;. After fetching, branches which no</span>
+<span class="c1"># longer exist on the remote will be deleted.</span>
+git<span class="w"> </span>fetch<span class="w"> </span>-p
+</pre></div>
+</div>
+<p>See details here:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.freecodecamp.org/news/how-to-delete-a-git-branch-both-locally-and-remotely/">https://www.freecodecamp.org/news/how-to-delete-a-git-branch-both-locally-and-remotely/</a></p></li>
+</ul>
 </section>
 </section>
 
@@ -86,9 +113,10 @@ git<span class="w"> </span>bisect<span class="w"> </span>good<span class="w"> </
     <h3><a href="../index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">Git</a><ul>
-<li><a class="reference internal" href="#compare-branches">Compare branches</a></li>
-<li><a class="reference internal" href="#create-a-branch-from-remote">Create a branch from remote</a></li>
-<li><a class="reference internal" href="#bisect-code">Bisect code</a></li>
+<li><a class="reference internal" href="#compare-branches">Compare Branches</a></li>
+<li><a class="reference internal" href="#create-a-branch-from-remote">Create a Branch from Remote</a></li>
+<li><a class="reference internal" href="#bisect-code">Bisect Code</a></li>
+<li><a class="reference internal" href="#how-to-delete-a-git-branch-both-locally-and-remotely">How to Delete a Git Branch Both Locally and Remotely</a></li>
 </ul>
 </li>
 </ul>
