@@ -71,9 +71,6 @@ Note that Fedora uses ``.bash_profile`` by default for users instead of ``.profi
 
 .. code-block:: bash
 
-    # Enable networking through VPN in WSL
-    wsl.exe -d wsl-vpnkit service wsl-vpnkit start
-    
     # Common places
     export BASE=""
     export TOOLS="$BASE/tools"
@@ -147,19 +144,30 @@ Install Rust
 
 .. _build-elfutils:
 
-Build and install elfutils
---------------------------
+Build and Install ``elfutils``
+------------------------------
+
+Dependencies for Fedora 37:
+
+.. code-block:: bash
+
+    sudo dnf install libmicrohttpd libmicrohttpd-devel libsq3 libsq3-devel libarchive libarchive-devel gettext-devel
+
+Dependencies for Ubuntu 22.04:
+
+.. code-block:: bash
+
+    sudo apt install libarchive-dev libsqlite3-dev libmicrohttpd-dev
 
 Build and install:
 
 .. code-block:: bash
 
-    sudo dnf install libmicrohttpd libmicrohttpd-devel libsq3 libsq3-devel libarchive libarchive-devel gettext-devel
     git clone https://sourceware.org/git/elfutils.git
+    cd elfutils
+    git checkout elfutils-0.189
     autoreconf -fi
-    mkdir -p elfutils/build
-    cp elfutils/build
-    ../configure --prefix=/tools/elfutils --enable-maintainer-mode
+    ./configure --prefix=/tools/elfutils --enable-maintainer-mode
     make
     make install
 
@@ -172,8 +180,8 @@ Configure your environment:
 
 .. _build-pahole:
 
-Build and install pahole
-------------------------
+Build and Install ``pahole``
+----------------------------
 
 .. warning::
 
@@ -184,12 +192,19 @@ Build and install pahole
     It leads to generating BTF information for 64-bit enumerations. However, Linux kernels below 6.0 version
     contain tools which don't support such BTF structures and crash while building the kernel. 
 
+Dependencies for Ubuntu 22.04:
+
+.. code-block:: bash
+
+    sudo apt install libdw-dev
+
 .. code-block:: bash
 
     git clone -b v1.23 https://git.kernel.org/pub/scm/devel/pahole/pahole.git
     mkdir pahole/build
     cd pahole/build
     cmake -D__LIB=lib -DCMAKE_INSTALL_PREFIX=/tools/pahole ..
+    make
     make install
 
 Configure your environment:
@@ -198,3 +213,12 @@ Configure your environment:
 
     export PATH=/tools/pahole/bin:$PATH
     export LD_LIBRARY_PATH=/tools/pahole/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+
+Build and Install ``bpftool``
+-----------------------------
+
+.. code-block:: bash
+
+    git clone --recurse-submodules https://github.com/libbpf/bpftool.git
+    cd src
+    make prefix=/tools/bpftool install-bin
