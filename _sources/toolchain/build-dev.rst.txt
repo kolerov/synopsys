@@ -142,7 +142,7 @@ Common scripts:
         cd $OUT_DIR
         $BUILDER_PATH/configure --target=$1 --enable-multilib --with-cpu=$2 --with-fpu=none \
             --with-target-cflags="-O0 -g3 -fvar-tracking-assignments" \
-            --with-target-cxxflags="-O0 -g3 -fvar-tracking-assignments"
+            --with-target-cxxflags="-O0 -g3 -fvar-tracking-assignments" \
             --prefix=$3
     }
 
@@ -173,4 +173,20 @@ An example for Linux toolchain for ARC HS 4x:
 
     prepare
     configure_linux arc archs $PREFIX
+    build
+
+An example for baremetal toolchain for ARC HS 4x:
+
+.. code-block:: bash
+    :caption: build-arc-elf32.sh
+
+    #!/bin/bash -ex
+
+    NAME="arc-elf32"
+    PREFIX="/tools/$NAME"
+
+    . common.sh
+
+    prepare
+    configure_baremetal arc archs $PREFIX
     build

@@ -172,7 +172,7 @@ configure_baremetal<span class="o">()</span><span class="w"> </span><span class=
 <span class="w">    </span><span class="nb">cd</span><span class="w"> </span><span class="nv">$OUT_DIR</span>
 <span class="w">    </span><span class="nv">$BUILDER_PATH</span>/configure<span class="w"> </span>--target<span class="o">=</span><span class="nv">$1</span><span class="w"> </span>--enable-multilib<span class="w"> </span>--with-cpu<span class="o">=</span><span class="nv">$2</span><span class="w"> </span>--with-fpu<span class="o">=</span>none<span class="w"> </span><span class="se">\</span>
 <span class="w">        </span>--with-target-cflags<span class="o">=</span><span class="s2">&quot;-O0 -g3 -fvar-tracking-assignments&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">        </span>--with-target-cxxflags<span class="o">=</span><span class="s2">&quot;-O0 -g3 -fvar-tracking-assignments&quot;</span>
+<span class="w">        </span>--with-target-cxxflags<span class="o">=</span><span class="s2">&quot;-O0 -g3 -fvar-tracking-assignments&quot;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">        </span>--prefix<span class="o">=</span><span class="nv">$3</span>
 <span class="o">}</span>
 
@@ -203,6 +203,22 @@ build_and_install<span class="o">()</span><span class="w"> </span><span class="o
 
 prepare
 configure_linux<span class="w"> </span>arc<span class="w"> </span>archs<span class="w"> </span><span class="nv">$PREFIX</span>
+build
+</pre></div>
+</div>
+</div>
+<p>An example for baremetal toolchain for ARC HS 4x:</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">build-arc-elf32.sh</span><a class="headerlink" href="#id3" title="Permalink to this code">¶</a></div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash -ex</span>
+
+<span class="nv">NAME</span><span class="o">=</span><span class="s2">&quot;arc-elf32&quot;</span>
+<span class="nv">PREFIX</span><span class="o">=</span><span class="s2">&quot;/tools/</span><span class="nv">$NAME</span><span class="s2">&quot;</span>
+
+.<span class="w"> </span>common.sh
+
+prepare
+configure_baremetal<span class="w"> </span>arc<span class="w"> </span>archs<span class="w"> </span><span class="nv">$PREFIX</span>
 build
 </pre></div>
 </div>

@@ -53,8 +53,9 @@
 <li><p><a class="reference internal" href="#configure-bashrc" id="id4">Configure <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code></a></p></li>
 <li><p><a class="reference internal" href="#setup-git" id="id5">Setup Git</a></p></li>
 <li><p><a class="reference internal" href="#install-rust" id="id6">Install Rust</a></p></li>
-<li><p><a class="reference internal" href="#build-and-install-elfutils" id="id7">Build and install elfutils</a></p></li>
-<li><p><a class="reference internal" href="#build-and-install-pahole" id="id8">Build and install pahole</a></p></li>
+<li><p><a class="reference internal" href="#build-and-install-elfutils" id="id7">Build and Install <code class="docutils literal notranslate"><span class="pre">elfutils</span></code></a></p></li>
+<li><p><a class="reference internal" href="#build-and-install-pahole" id="id8">Build and Install <code class="docutils literal notranslate"><span class="pre">pahole</span></code></a></p></li>
+<li><p><a class="reference internal" href="#build-and-install-bpftool" id="id9">Build and Install <code class="docutils literal notranslate"><span class="pre">bpftool</span></code></a></p></li>
 </ul>
 </nav>
 <section id="bootstrap-ubuntu-22-04">
@@ -109,10 +110,7 @@ sudo<span class="w"> </span>dnf<span class="w"> </span>groupinstall<span class="
 <section id="configure-profile">
 <h2><a class="toc-backref" href="#id3" role="doc-backlink">Configure <code class="docutils literal notranslate"><span class="pre">.profile</span></code></a><a class="headerlink" href="#configure-profile" title="Permalink to this heading">¶</a></h2>
 <p>Note that Fedora uses <code class="docutils literal notranslate"><span class="pre">.bash_profile</span></code> by default for users instead of <code class="docutils literal notranslate"><span class="pre">.profile</span></code>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Enable networking through VPN in WSL</span>
-wsl.exe<span class="w"> </span>-d<span class="w"> </span>wsl-vpnkit<span class="w"> </span>service<span class="w"> </span>wsl-vpnkit<span class="w"> </span>start
-
-<span class="c1"># Common places</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Common places</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">BASE</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">TOOLS</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$BASE</span><span class="s2">/tools&quot;</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">REPOS</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$BASE</span><span class="s2">/repos&quot;</span>
@@ -182,14 +180,21 @@ git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"
 </div>
 </section>
 <section id="build-and-install-elfutils">
-<span id="build-elfutils"></span><h2><a class="toc-backref" href="#id7" role="doc-backlink">Build and install elfutils</a><a class="headerlink" href="#build-and-install-elfutils" title="Permalink to this heading">¶</a></h2>
-<p>Build and install:</p>
+<span id="build-elfutils"></span><h2><a class="toc-backref" href="#id7" role="doc-backlink">Build and Install <code class="docutils literal notranslate"><span class="pre">elfutils</span></code></a><a class="headerlink" href="#build-and-install-elfutils" title="Permalink to this heading">¶</a></h2>
+<p>Dependencies for Fedora 37:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>dnf<span class="w"> </span>install<span class="w"> </span>libmicrohttpd<span class="w"> </span>libmicrohttpd-devel<span class="w"> </span>libsq3<span class="w"> </span>libsq3-devel<span class="w"> </span>libarchive<span class="w"> </span>libarchive-devel<span class="w"> </span>gettext-devel
-git<span class="w"> </span>clone<span class="w"> </span>https://sourceware.org/git/elfutils.git
+</pre></div>
+</div>
+<p>Dependencies for Ubuntu 22.04:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>libarchive-dev<span class="w"> </span>libsqlite3-dev<span class="w"> </span>libmicrohttpd-dev
+</pre></div>
+</div>
+<p>Build and install:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://sourceware.org/git/elfutils.git
+<span class="nb">cd</span><span class="w"> </span>elfutils
+git<span class="w"> </span>checkout<span class="w"> </span>elfutils-0.189
 autoreconf<span class="w"> </span>-fi
-mkdir<span class="w"> </span>-p<span class="w"> </span>elfutils/build
-cp<span class="w"> </span>elfutils/build
-../configure<span class="w"> </span>--prefix<span class="o">=</span>/tools/elfutils<span class="w"> </span>--enable-maintainer-mode
+./configure<span class="w"> </span>--prefix<span class="o">=</span>/tools/elfutils<span class="w"> </span>--enable-maintainer-mode
 make
 make<span class="w"> </span>install
 </pre></div>
@@ -201,7 +206,7 @@ make<span class="w"> </span>install
 </div>
 </section>
 <section id="build-and-install-pahole">
-<span id="build-pahole"></span><h2><a class="toc-backref" href="#id8" role="doc-backlink">Build and install pahole</a><a class="headerlink" href="#build-and-install-pahole" title="Permalink to this heading">¶</a></h2>
+<span id="build-pahole"></span><h2><a class="toc-backref" href="#id8" role="doc-backlink">Build and Install <code class="docutils literal notranslate"><span class="pre">pahole</span></code></a><a class="headerlink" href="#build-and-install-pahole" title="Permalink to this heading">¶</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>We use here 1.23 version of Pahole because of this commit in the latest version:</p>
@@ -211,16 +216,29 @@ make<span class="w"> </span>install
 <p>It leads to generating BTF information for 64-bit enumerations. However, Linux kernels below 6.0 version
 contain tools which don’t support such BTF structures and crash while building the kernel.</p>
 </div>
+<p>Dependencies for Ubuntu 22.04:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>libdw-dev
+</pre></div>
+</div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>v1.23<span class="w"> </span>https://git.kernel.org/pub/scm/devel/pahole/pahole.git
 mkdir<span class="w"> </span>pahole/build
 <span class="nb">cd</span><span class="w"> </span>pahole/build
 cmake<span class="w"> </span>-D__LIB<span class="o">=</span>lib<span class="w"> </span>-DCMAKE_INSTALL_PREFIX<span class="o">=</span>/tools/pahole<span class="w"> </span>..
+make
 make<span class="w"> </span>install
 </pre></div>
 </div>
 <p>Configure your environment:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span>/tools/pahole/bin:<span class="nv">$PATH</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span>/tools/pahole/lib<span class="si">${</span><span class="nv">LD_LIBRARY_PATH</span><span class="p">:+:</span><span class="nv">$LD_LIBRARY_PATH</span><span class="si">}</span>
+</pre></div>
+</div>
+</section>
+<section id="build-and-install-bpftool">
+<h2><a class="toc-backref" href="#id9" role="doc-backlink">Build and Install <code class="docutils literal notranslate"><span class="pre">bpftool</span></code></a><a class="headerlink" href="#build-and-install-bpftool" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>--recurse-submodules<span class="w"> </span>https://github.com/libbpf/bpftool.git
+<span class="nb">cd</span><span class="w"> </span>src
+make<span class="w"> </span><span class="nv">prefix</span><span class="o">=</span>/tools/bpftool<span class="w"> </span>install-bin
 </pre></div>
 </div>
 </section>
@@ -243,8 +261,9 @@ make<span class="w"> </span>install
 <li><a class="reference internal" href="#configure-bashrc">Configure <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code></a></li>
 <li><a class="reference internal" href="#setup-git">Setup Git</a></li>
 <li><a class="reference internal" href="#install-rust">Install Rust</a></li>
-<li><a class="reference internal" href="#build-and-install-elfutils">Build and install elfutils</a></li>
-<li><a class="reference internal" href="#build-and-install-pahole">Build and install pahole</a></li>
+<li><a class="reference internal" href="#build-and-install-elfutils">Build and Install <code class="docutils literal notranslate"><span class="pre">elfutils</span></code></a></li>
+<li><a class="reference internal" href="#build-and-install-pahole">Build and Install <code class="docutils literal notranslate"><span class="pre">pahole</span></code></a></li>
+<li><a class="reference internal" href="#build-and-install-bpftool">Build and Install <code class="docutils literal notranslate"><span class="pre">bpftool</span></code></a></li>
 </ul>
 </li>
 </ul>
