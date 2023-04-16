@@ -96,12 +96,12 @@ make<span class="w"> </span>mrproper
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># For ARCv2</span>
 ./configure<span class="w"> </span>--target<span class="o">=</span>arc<span class="w"> </span>--with-cpu<span class="o">=</span>archs<span class="w"> </span>--enable-linux<span class="w"> </span>--disable-werror<span class="w"> </span>--disable-qemu<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--with-linux-headers-src<span class="o">=</span>/headers/path/../include<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--prefix<span class="o">=</span>/tools/arc-snps-linux-gnu
+<span class="w">    </span>--prefix<span class="o">=</span>/tools/arc-linux-gnu
 
 <span class="c1"># For ARCv3 (HS6x)</span>
 ./configure<span class="w"> </span>--target<span class="o">=</span>arc64<span class="w"> </span>--enable-linux<span class="w"> </span>--disable-werror<span class="w"> </span>--disable-qemu<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--with-linux-headers-src<span class="o">=</span>/headers/path/../include<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--prefix<span class="o">=</span>/tools/arc64-snps-linux-gnu
+<span class="w">    </span>--prefix<span class="o">=</span>/tools/arc64-linux-gnu
 
 make<span class="w"> </span>-j<span class="w"> </span><span class="k">$(</span>nproc<span class="k">)</span>
 make<span class="w"> </span>install
