@@ -65,12 +65,12 @@ Configure and build:
     # For ARCv2
     ./configure --target=arc --with-cpu=archs --enable-linux --disable-werror --disable-qemu \
         --with-linux-headers-src=/headers/path/../include \
-        --prefix=/tools/arc-snps-linux-gnu
+        --prefix=/tools/arc-linux-gnu
 
     # For ARCv3 (HS6x)
     ./configure --target=arc64 --enable-linux --disable-werror --disable-qemu \
         --with-linux-headers-src=/headers/path/../include \
-        --prefix=/tools/arc64-snps-linux-gnu
+        --prefix=/tools/arc64-linux-gnu
 
     make -j $(nproc)
     make install
