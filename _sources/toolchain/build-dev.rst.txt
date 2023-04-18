@@ -190,3 +190,32 @@ An example for baremetal toolchain for ARC HS 4x:
     prepare
     configure_baremetal arc archs $PREFIX
     build
+
+Build GMP and MPFR for Binutils
+-------------------------------
+
+Install ``lzip`` because GMP is packed by LZ:
+
+.. code-block:: bash
+
+    sudo apt install lzip
+
+Building GMP:
+
+.. code-block:: bash
+
+	wget https://gmplib.org/download/gmp/gmp-6.2.1.tar.lz
+	tar -xvf gmp-6.2.1.tar.lz
+    cd gmp-6.2.1
+	./configure --prefix=/usr --host=arc-linux-gnu --enable-shared=no
+	make DESTDIR=/tools/arc-linux-gnu/sysroot install
+
+Building MPFR:
+
+.. code-block:: bash
+
+	git clone https://gitlab.inria.fr/mpfr/mpfr.git
+    cd mpfr
+	./autogen.sh
+	./configure --host=arc-linux-gnu --prefix=/usr --with-gmp=/tools/arc-sysroot --enable-shared=no
+	make DESTDIR=/tools/arc-sysroot install

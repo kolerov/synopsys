@@ -224,6 +224,29 @@ build
 </div>
 </div>
 </section>
+<section id="build-gmp-and-mpfr-for-binutils">
+<h2>Build GMP and MPFR for Binutils<a class="headerlink" href="#build-gmp-and-mpfr-for-binutils" title="Permalink to this heading">¶</a></h2>
+<p>Install <code class="docutils literal notranslate"><span class="pre">lzip</span></code> because GMP is packed by LZ:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>lzip
+</pre></div>
+</div>
+<p>Building GMP:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w">    </span>wget<span class="w"> </span>https://gmplib.org/download/gmp/gmp-6.2.1.tar.lz
+<span class="w">    </span>tar<span class="w"> </span>-xvf<span class="w"> </span>gmp-6.2.1.tar.lz
+<span class="nb">cd</span><span class="w"> </span>gmp-6.2.1
+<span class="w">    </span>./configure<span class="w"> </span>--prefix<span class="o">=</span>/usr<span class="w"> </span>--host<span class="o">=</span>arc-linux-gnu<span class="w"> </span>--enable-shared<span class="o">=</span>no
+<span class="w">    </span>make<span class="w"> </span><span class="nv">DESTDIR</span><span class="o">=</span>/tools/arc-linux-gnu/sysroot<span class="w"> </span>install
+</pre></div>
+</div>
+<p>Building MPFR:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w">    </span>git<span class="w"> </span>clone<span class="w"> </span>https://gitlab.inria.fr/mpfr/mpfr.git
+<span class="nb">cd</span><span class="w"> </span>mpfr
+<span class="w">    </span>./autogen.sh
+<span class="w">    </span>./configure<span class="w"> </span>--host<span class="o">=</span>arc-linux-gnu<span class="w"> </span>--prefix<span class="o">=</span>/usr<span class="w"> </span>--with-gmp<span class="o">=</span>/tools/arc-sysroot<span class="w"> </span>--enable-shared<span class="o">=</span>no
+<span class="w">    </span>make<span class="w"> </span><span class="nv">DESTDIR</span><span class="o">=</span>/tools/arc-sysroot<span class="w"> </span>install
+</pre></div>
+</div>
+</section>
 </section>
 
 
@@ -241,6 +264,7 @@ build
 <li><a class="reference internal" href="#build-baremetal-toolchain">Build baremetal toolchain</a></li>
 <li><a class="reference internal" href="#build-linux-toolchain">Build Linux toolchain</a></li>
 <li><a class="reference internal" href="#scripts">Scripts</a></li>
+<li><a class="reference internal" href="#build-gmp-and-mpfr-for-binutils">Build GMP and MPFR for Binutils</a></li>
 </ul>
 </li>
 </ul>
