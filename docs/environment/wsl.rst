@@ -70,8 +70,9 @@ Create `.wslconfig` in `$USER`:
 
 .. code-block:: toml
 
-	[wsl2]
-	memory=10GB
+    [wsl2]
+    memory=8GB
+    processors=4
 
 Create ``/etc/wsl.conf`` on target:
 
