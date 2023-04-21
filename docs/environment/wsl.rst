@@ -1,7 +1,7 @@
 .. highlight:: text
 
-WSL
-===
+Configuring WSL
+===============
 
 Install Ubuntu
 --------------
