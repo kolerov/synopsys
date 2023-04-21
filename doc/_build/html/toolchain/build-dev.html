@@ -1,0 +1,326 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Building from arc-gnu-toolchain &#8212; Kolerov&#39;s Notes 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Building from crosstool-ng" href="build-prod.html" />
+    <link rel="prev" title="GNU Toolchain" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="build-prod.html" title="Building from crosstool-ng"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="GNU Toolchain"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Kolerov&#39;s Notes 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">GNU Toolchain</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Building from <code class="docutils literal notranslate"><span class="pre">arc-gnu-toolchain</span></code></a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="building-from-arc-gnu-toolchain">
+<h1>Building from <code class="docutils literal notranslate"><span class="pre">arc-gnu-toolchain</span></code><a class="headerlink" href="#building-from-arc-gnu-toolchain" title="Permalink to this heading">¶</a></h1>
+<section id="prepare-environment">
+<h2>Prepare environment<a class="headerlink" href="#prepare-environment" title="Permalink to this heading">¶</a></h2>
+<p>You can find a repository here: <a class="reference external" href="https://github.com/foss-for-synopsys-dwc-arc-processors/arc-gnu-toolchain">https://github.com/foss-for-synopsys-dwc-arc-processors/arc-gnu-toolchain</a>. It’s used
+for building development versions of the toolchain.</p>
+<p>Firstly, prepare your environment:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>autoconf<span class="w"> </span>automake<span class="w"> </span>autotools-dev<span class="w"> </span>curl<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>libmpc-dev<span class="w"> </span>libmpfr-dev<span class="w"> </span>libgmp-dev<span class="w"> </span>libexpat1-dev<span class="w"> </span>gawk<span class="w"> </span>build-essential<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>libncurses-dev<span class="w"> </span>bison<span class="w"> </span>flex<span class="w"> </span>texinfo<span class="w"> </span>gperf<span class="w"> </span>libtool<span class="w"> </span>libtool-bin<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>patchutils<span class="w"> </span>bc<span class="w"> </span>zlib1g-dev
+</pre></div>
+</div>
+<p>Obtain and configure scripts:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/foss-for-synopsys-dwc-arc-processors/arc-gnu-toolchain
+cg<span class="w"> </span>arc-gnu-toolchain
+autoconf
+</pre></div>
+</div>
+</section>
+<section id="build-baremetal-toolchain">
+<h2>Build baremetal toolchain<a class="headerlink" href="#build-baremetal-toolchain" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># ARCv2 - baremetal</span>
+./configure<span class="w"> </span>--target<span class="o">=</span>arc<span class="w"> </span>--with-cpu<span class="o">=</span>archs<span class="w"> </span>--prefix<span class="o">=</span>/tools/arc-elf32<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--enable-multilib<span class="w"> </span>--disable-werror<span class="w"> </span>--disable-qemu<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--with-target-cflags<span class="o">=</span><span class="s2">&quot;-O0 -g3 -fvar-tracking-assignments&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--with-target-cxxflags<span class="o">=</span><span class="s2">&quot;-O0 -g3 -fvar-tracking-assignments&quot;</span>
+
+<span class="c1"># ARCv3 - baremetal</span>
+./configure<span class="w"> </span>--target<span class="o">=</span>arc64<span class="w"> </span>--with-cpu<span class="o">=</span>hs6x<span class="w"> </span>--prefix<span class="o">=</span>/tools/arc64-elf<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--enable-multilib<span class="w"> </span>--disable-werror<span class="w"> </span>--disable-qemu<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--with-target-cflags<span class="o">=</span><span class="s2">&quot;-O0 -g3 -fvar-tracking-assignments&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--with-target-cxxflags<span class="o">=</span><span class="s2">&quot;-O0 -g3 -fvar-tracking-assignments&quot;</span>
+
+make<span class="w"> </span>-j<span class="w"> </span><span class="k">$(</span>nproc<span class="k">)</span>
+make<span class="w"> </span>install
+</pre></div>
+</div>
+</section>
+<section id="build-linux-toolchain">
+<h2>Build Linux toolchain<a class="headerlink" href="#build-linux-toolchain" title="Permalink to this heading">¶</a></h2>
+<p>Prepare headers:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/foss-for-synopsys-dwc-arc-processors/linux
+<span class="nb">cd</span><span class="w"> </span>linux
+git<span class="w"> </span>checkout<span class="w"> </span>arc64
+make<span class="w"> </span>mrproper
+make<span class="w"> </span>headers_install<span class="w"> </span><span class="nv">ARCH</span><span class="o">=</span>arc<span class="w"> </span><span class="nv">CROSS_COMPILE</span><span class="o">=</span><span class="s2">&quot;arc-elf32-&quot;</span><span class="w"> </span><span class="nv">INSTALL_HDR_PATH</span><span class="o">=</span>/repos/linux-headers-5.16
+make<span class="w"> </span>mrproper
+</pre></div>
+</div>
+<p>Configure and build:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># For ARCv2</span>
+./configure<span class="w"> </span>--target<span class="o">=</span>arc<span class="w"> </span>--with-cpu<span class="o">=</span>archs<span class="w"> </span>--enable-linux<span class="w"> </span>--disable-werror<span class="w"> </span>--disable-qemu<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--with-linux-headers-src<span class="o">=</span>/headers/path/../include<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--prefix<span class="o">=</span>/tools/arc-linux-gnu
+
+<span class="c1"># For ARCv3 (HS6x)</span>
+./configure<span class="w"> </span>--target<span class="o">=</span>arc64<span class="w"> </span>--enable-linux<span class="w"> </span>--disable-werror<span class="w"> </span>--disable-qemu<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--with-linux-headers-src<span class="o">=</span>/headers/path/../include<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--prefix<span class="o">=</span>/tools/arc64-linux-gnu
+
+make<span class="w"> </span>-j<span class="w"> </span><span class="k">$(</span>nproc<span class="k">)</span>
+make<span class="w"> </span>install
+</pre></div>
+</div>
+</section>
+<section id="scripts">
+<h2>Scripts<a class="headerlink" href="#scripts" title="Permalink to this heading">¶</a></h2>
+<p>My tree for building environment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ tree -L 2
+.
+├── build-arc-linux-gnu.sh
+├── common.sh
+├── out
+│   ├── arc-elf32
+│   ├── arc-linux-gnu
+│   ├── arc32-linux-uclibc
+│   ├── arc64-elf
+│   └── arc64-linux-gnu
+└── src
+    ├── arc-gnu-toolchain
+    ├── binutils-gdb
+    ├── gcc
+    ├── glibc
+    ├── linux-headers
+    └── newlib
+
+13 directories, 2 files
+</pre></div>
+</div>
+<p>Common scripts:</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">common.sh</span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">BUILDER_PATH</span><span class="o">=</span><span class="sb">`</span>realpath<span class="w"> </span>./src/arc-gnu-toolchain<span class="sb">`</span>
+<span class="nv">HEADERS_PATH</span><span class="o">=</span><span class="sb">`</span>realpath<span class="w"> </span>./src/linux-headers/include<span class="sb">`</span>
+<span class="nv">OUT_DIR</span><span class="o">=</span><span class="sb">`</span>realpath<span class="w"> </span>out/<span class="nv">$NAME</span><span class="sb">`</span>
+<span class="nv">LOG_FILE</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">OUT_DIR</span><span class="si">}</span><span class="s2">/build.log&quot;</span>
+
+prepare<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">    </span>rm<span class="w"> </span>-rf<span class="w"> </span><span class="nv">$OUT_DIR</span>
+<span class="w">    </span>mkdir<span class="w"> </span><span class="nv">$OUT_DIR</span>
+<span class="w">    </span>touch<span class="w"> </span><span class="nv">$LOG_FILE</span>
+<span class="w">    </span><span class="nb">cd</span><span class="w"> </span><span class="nv">$OUT_DIR</span>
+<span class="o">}</span>
+
+<span class="c1"># $1 - for --target=...</span>
+<span class="c1"># $2 - for --with=cpu=...</span>
+<span class="c1"># $3 - for prefix</span>
+configure_linux<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">    </span><span class="nb">unset</span><span class="w"> </span>LD_LIBRARY_PATH
+<span class="w">    </span><span class="nb">source</span><span class="w"> </span>/etc/environment
+<span class="w">    </span><span class="nb">export</span><span class="w"> </span>PATH
+<span class="w">    </span><span class="nv">$BUILDER_PATH</span>/configure<span class="w"> </span>--target<span class="o">=</span><span class="nv">$1</span><span class="w"> </span>--enable-linux<span class="w"> </span>--with-cpu<span class="o">=</span><span class="nv">$2</span><span class="w"> </span>--with-fpu<span class="o">=</span>none<span class="w"> </span><span class="se">\</span>
+<span class="w">        </span>--with-linux-headers-src<span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">HEADERS_PATH</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span>--prefix<span class="o">=</span><span class="nv">$3</span>
+<span class="o">}</span>
+
+<span class="c1"># $1 - for --target=...</span>
+<span class="c1"># $2 - for --with=cpu=...</span>
+<span class="c1"># $3 - for prefix</span>
+configure_baremetal<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">    </span><span class="nb">unset</span><span class="w"> </span>LD_LIBRARY_PATH
+<span class="w">    </span><span class="nb">source</span><span class="w"> </span>/etc/environment
+<span class="w">    </span><span class="nb">export</span><span class="w"> </span>PATH
+<span class="w">    </span>rm<span class="w"> </span>-rf<span class="w"> </span><span class="nv">$OUT_DIR</span>
+<span class="w">    </span>mkdir<span class="w"> </span><span class="nv">$OUT_DIR</span>
+<span class="w">    </span>touch<span class="w"> </span><span class="nv">$LOG_FILE</span>
+<span class="w">    </span><span class="nb">cd</span><span class="w"> </span><span class="nv">$OUT_DIR</span>
+<span class="w">    </span><span class="nv">$BUILDER_PATH</span>/configure<span class="w"> </span>--target<span class="o">=</span><span class="nv">$1</span><span class="w"> </span>--enable-multilib<span class="w"> </span>--with-cpu<span class="o">=</span><span class="nv">$2</span><span class="w"> </span>--with-fpu<span class="o">=</span>none<span class="w"> </span><span class="se">\</span>
+<span class="w">        </span>--with-target-cflags<span class="o">=</span><span class="s2">&quot;-O0 -g3 -fvar-tracking-assignments&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span>--with-target-cxxflags<span class="o">=</span><span class="s2">&quot;-O0 -g3 -fvar-tracking-assignments&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span>--prefix<span class="o">=</span><span class="nv">$3</span>
+<span class="o">}</span>
+
+build<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">    </span><span class="nb">unset</span><span class="w"> </span>LD_LIBRARY_PATH
+<span class="w">    </span><span class="nb">source</span><span class="w"> </span>/etc/environment
+<span class="w">    </span><span class="nb">export</span><span class="w"> </span>PATH
+<span class="w">    </span>make<span class="w"> </span>clean
+<span class="w">    </span>make<span class="w"> </span><span class="nv">V</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>-j<span class="w"> </span><span class="k">$(</span>nproc<span class="k">)</span><span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>tee<span class="w"> </span><span class="nv">$LOG_FILE</span>
+<span class="o">}</span>
+
+build_and_install<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">    </span>build
+<span class="w">    </span>make<span class="w"> </span>install
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<p>An example for Linux toolchain for ARC HS 4x:</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">build-arc-linux-gnu.sh</span><a class="headerlink" href="#id2" title="Permalink to this code">¶</a></div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash -ex</span>
+
+<span class="nv">NAME</span><span class="o">=</span><span class="s2">&quot;arc-linux-gnu&quot;</span>
+<span class="nv">PREFIX</span><span class="o">=</span><span class="s2">&quot;/tools/</span><span class="nv">$NAME</span><span class="s2">&quot;</span>
+
+.<span class="w"> </span>common.sh
+
+prepare
+configure_linux<span class="w"> </span>arc<span class="w"> </span>archs<span class="w"> </span><span class="nv">$PREFIX</span>
+build
+</pre></div>
+</div>
+</div>
+<p>An example for baremetal toolchain for ARC HS 4x:</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">build-arc-elf32.sh</span><a class="headerlink" href="#id3" title="Permalink to this code">¶</a></div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash -ex</span>
+
+<span class="nv">NAME</span><span class="o">=</span><span class="s2">&quot;arc-elf32&quot;</span>
+<span class="nv">PREFIX</span><span class="o">=</span><span class="s2">&quot;/tools/</span><span class="nv">$NAME</span><span class="s2">&quot;</span>
+
+.<span class="w"> </span>common.sh
+
+prepare
+configure_baremetal<span class="w"> </span>arc<span class="w"> </span>archs<span class="w"> </span><span class="nv">$PREFIX</span>
+build
+</pre></div>
+</div>
+</div>
+</section>
+<section id="build-gmp-and-mpfr-for-binutils">
+<h2>Build GMP and MPFR for Binutils<a class="headerlink" href="#build-gmp-and-mpfr-for-binutils" title="Permalink to this heading">¶</a></h2>
+<p>Install <code class="docutils literal notranslate"><span class="pre">lzip</span></code> because GMP is packed by LZ:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>lzip
+</pre></div>
+</div>
+<p>Building GMP:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w">    </span>wget<span class="w"> </span>https://gmplib.org/download/gmp/gmp-6.2.1.tar.lz
+<span class="w">    </span>tar<span class="w"> </span>-xvf<span class="w"> </span>gmp-6.2.1.tar.lz
+<span class="nb">cd</span><span class="w"> </span>gmp-6.2.1
+<span class="w">    </span>./configure<span class="w"> </span>--prefix<span class="o">=</span>/usr<span class="w"> </span>--host<span class="o">=</span>arc-linux-gnu<span class="w"> </span>--enable-shared<span class="o">=</span>no
+<span class="w">    </span>make<span class="w"> </span><span class="nv">DESTDIR</span><span class="o">=</span>/tools/arc-linux-gnu/sysroot<span class="w"> </span>install
+</pre></div>
+</div>
+<p>Building MPFR:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w">    </span>git<span class="w"> </span>clone<span class="w"> </span>https://gitlab.inria.fr/mpfr/mpfr.git
+<span class="nb">cd</span><span class="w"> </span>mpfr
+<span class="w">    </span>./autogen.sh
+<span class="w">    </span>./configure<span class="w"> </span>--host<span class="o">=</span>arc-linux-gnu<span class="w"> </span>--prefix<span class="o">=</span>/usr<span class="w"> </span>--with-gmp<span class="o">=</span>/tools/arc-sysroot<span class="w"> </span>--enable-shared<span class="o">=</span>no
+<span class="w">    </span>make<span class="w"> </span><span class="nv">DESTDIR</span><span class="o">=</span>/tools/arc-sysroot<span class="w"> </span>install
+</pre></div>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Building from <code class="docutils literal notranslate"><span class="pre">arc-gnu-toolchain</span></code></a><ul>
+<li><a class="reference internal" href="#prepare-environment">Prepare environment</a></li>
+<li><a class="reference internal" href="#build-baremetal-toolchain">Build baremetal toolchain</a></li>
+<li><a class="reference internal" href="#build-linux-toolchain">Build Linux toolchain</a></li>
+<li><a class="reference internal" href="#scripts">Scripts</a></li>
+<li><a class="reference internal" href="#build-gmp-and-mpfr-for-binutils">Build GMP and MPFR for Binutils</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="index.html"
+                          title="previous chapter">GNU Toolchain</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="build-prod.html"
+                          title="next chapter">Building from <code class="docutils literal notranslate"><span class="pre">crosstool-ng</span></code></a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/toolchain/build-dev.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="build-prod.html" title="Building from crosstool-ng"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="GNU Toolchain"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Kolerov&#39;s Notes 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >GNU Toolchain</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Building from <code class="docutils literal notranslate"><span class="pre">arc-gnu-toolchain</span></code></a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Yuriy Kolerov.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+    </div>
+  </body>
+</html>

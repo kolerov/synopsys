@@ -1,0 +1,145 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>🟡 Some stack operations are not presented in QEMU &#8212; Kolerov&#39;s Notes 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="🟢 .file directive does not work as intended" href="binutils_file_bug.html" />
+    <link rel="prev" title="🟡 glibc testsuite fails with vanilla Linux kernels" href="glibc_mmu_bug.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="binutils_file_bug.html" title="🟢 .file directive does not work as intended"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="glibc_mmu_bug.html" title="🟡 glibc testsuite fails with vanilla Linux kernels"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Kolerov&#39;s Notes 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Tasks</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">🟡 Some stack operations are not presented in QEMU</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="some-stack-operations-are-not-presented-in-qemu">
+<h1>🟡 Some stack operations are not presented in QEMU<a class="headerlink" href="#some-stack-operations-are-not-presented-in-qemu" title="Permalink to this heading">¶</a></h1>
+<p>Consider this example <code class="docutils literal notranslate"><span class="pre">main.c</span></code>:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">);</span>
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Compile this code for HS 4x and HS 5x using both GCC and MWDT:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>ccac<span class="w"> </span>-av2hs<span class="w"> </span>-g<span class="w"> </span>-c<span class="w"> </span>main.c<span class="w"> </span>-o<span class="w"> </span>main-ccac-hs4x.o
+ccac<span class="w"> </span>-av3hs<span class="w"> </span>-g<span class="w"> </span>-c<span class="w"> </span>main.c<span class="w"> </span>-o<span class="w"> </span>main-ccac-hs5x.o
+arc-elf32-gcc<span class="w"> </span>-mcpu<span class="o">=</span>archs<span class="w"> </span>-g<span class="w"> </span>-c<span class="w"> </span>main.c<span class="w"> </span>-o<span class="w"> </span>main-gcc-hs4x.o
+arc64-elf-gcc<span class="w"> </span>-mcpu<span class="o">=</span>hs5x<span class="w"> </span>-g<span class="w"> </span>-c<span class="w"> </span>main.c<span class="w"> </span>-o<span class="w"> </span>main-gcc-hs5x.o
+</pre></div>
+</div>
+<p>Then you can find that objdump cannot recognize it:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ arc64-elf-objdump -d main-ccac-hs5x.o
+
+main-ccac-hs5x.o:     file format elf32-littlearc64
+…
+00000004 &lt;main&gt;:
+4:   c0f1                    .shor   0xc0f1
+6:   740c                    mov_s   r0,4
+8:   752c                    mov_s   r1,5
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">c0f1</span></code> is exactly <code class="docutils literal notranslate"><span class="pre">push_s</span> <span class="pre">blink</span></code>. Also, <code class="docutils literal notranslate"><span class="pre">qemu-system-arc64</span></code> crashes on this opcode. GDB does not
+recognize this opcode too.</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="glibc_mmu_bug.html"
+                          title="previous chapter">🟡 glibc testsuite fails with vanilla Linux kernels</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="binutils_file_bug.html"
+                          title="next chapter">🟢 <code class="docutils literal notranslate"><span class="pre">.file</span></code> directive does not work as intended</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tasks/qemu_stack_ops.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="binutils_file_bug.html" title="🟢 .file directive does not work as intended"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="glibc_mmu_bug.html" title="🟡 glibc testsuite fails with vanilla Linux kernels"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Kolerov&#39;s Notes 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Tasks</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">🟡 Some stack operations are not presented in QEMU</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Yuriy Kolerov.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+    </div>
+  </body>
+</html>

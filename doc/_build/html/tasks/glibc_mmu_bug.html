@@ -1,0 +1,299 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>🟡 glibc testsuite fails with vanilla Linux kernels &#8212; Kolerov&#39;s Notes 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="🟡 Some stack operations are not presented in QEMU" href="qemu_stack_ops.html" />
+    <link rel="prev" title="Tasks" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="qemu_stack_ops.html" title="🟡 Some stack operations are not presented in QEMU"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Tasks"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Kolerov&#39;s Notes 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Tasks</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">🟡 glibc testsuite fails with vanilla Linux kernels</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="glibc-testsuite-fails-with-vanilla-linux-kernels">
+<h1>🟡 glibc testsuite fails with vanilla Linux kernels<a class="headerlink" href="#glibc-testsuite-fails-with-vanilla-linux-kernels" title="Permalink to this heading">¶</a></h1>
+<section id="the-problem">
+<h2>The Problem<a class="headerlink" href="#the-problem" title="Permalink to this heading">¶</a></h2>
+<p>Issue is initially described on GitHub: <a class="reference external" href="https://github.com/foss-for-synopsys-dwc-arc-processors/qemu/issues/147">https://github.com/foss-for-synopsys-dwc-arc-processors/qemu/issues/147</a></p>
+</section>
+<section id="configure-nfs-fedora-37">
+<h2>Configure NFS (Fedora 37)<a class="headerlink" href="#configure-nfs-fedora-37" title="Permalink to this heading">¶</a></h2>
+<p>Install NFS:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>dnf<span class="w"> </span>-y<span class="w"> </span>install<span class="w"> </span>nfs-utils
+</pre></div>
+</div>
+<p>Add this line to <code class="docutils literal notranslate"><span class="pre">/etc/exports</span></code> (you can find <code class="docutils literal notranslate"><span class="pre">anonuid</span></code> and <code class="docutils literal notranslate"><span class="pre">anongid</span></code> using <code class="docutils literal notranslate"><span class="pre">id</span> <span class="pre">-u</span></code> and <code class="docutils literal notranslate"><span class="pre">id</span> <span class="pre">-g</span></code> respectively):</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>/home/ykolerov/workspace *(rw,all_squash,anonuid=1000,anongid=1000,no_subtree_check,insecure)
+</pre></div>
+</div>
+<p>Enable services and add rules for firewall:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>--now<span class="w"> </span>rpcbind<span class="w"> </span>nfs-server
+sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>sshd
+sudo<span class="w"> </span>systemctl<span class="w"> </span>start<span class="w"> </span>sshd
+sudo<span class="w"> </span>firewall-cmd<span class="w"> </span>--add-service<span class="o">=</span>nfs<span class="w"> </span>--permanent
+sudo<span class="w"> </span>firewall-cmd<span class="w"> </span>--add-service<span class="o">={</span>nfs3,mountd,rpc-bind<span class="o">}</span><span class="w"> </span>--permanent
+sudo<span class="w"> </span>firewall-cmd<span class="w"> </span>--reload
+</pre></div>
+</div>
+</section>
+<section id="configure-nfs-wsl2-with-ubuntu-22-04">
+<h2>Configure NFS (WSL2 with Ubuntu 22.04)<a class="headerlink" href="#configure-nfs-wsl2-with-ubuntu-22-04" title="Permalink to this heading">¶</a></h2>
+<p>Add this line to <code class="docutils literal notranslate"><span class="pre">/etc/exports</span></code> (you can find <code class="docutils literal notranslate"><span class="pre">anonuid</span></code> and <code class="docutils literal notranslate"><span class="pre">anongid</span></code> using <code class="docutils literal notranslate"><span class="pre">id</span> <span class="pre">-u</span></code> and <code class="docutils literal notranslate"><span class="pre">id</span> <span class="pre">-g</span></code> respectively):</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>/home/ykolerov/workspace *(rw,all_squash,anonuid=1000,anongid=1000,no_subtree_check,insecure)
+</pre></div>
+</div>
+<p>Enable services:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>service<span class="w"> </span>rpcbind<span class="w"> </span>start
+sudo<span class="w"> </span>service<span class="w"> </span>nfs-kernel-server<span class="w"> </span>start
+sudo<span class="w"> </span>exportfs<span class="w"> </span>-a
+</pre></div>
+</div>
+</section>
+<section id="configure-tap-interface">
+<h2>Configure TAP interface<a class="headerlink" href="#configure-tap-interface" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>ip<span class="w"> </span>tuntap<span class="w"> </span>add<span class="w"> </span>tap1<span class="w"> </span>mode<span class="w"> </span>tap
+sudo<span class="w"> </span>ip<span class="w"> </span>addr<span class="w"> </span>add<span class="w"> </span><span class="m">10</span>.42.0.1/24<span class="w"> </span>dev<span class="w"> </span>tap1
+sudo<span class="w"> </span>ip<span class="w"> </span>link<span class="w"> </span><span class="nb">set</span><span class="w"> </span>tap1<span class="w"> </span>up
+</pre></div>
+</div>
+</section>
+<section id="reproduce">
+<h2>Reproduce<a class="headerlink" href="#reproduce" title="Permalink to this heading">¶</a></h2>
+<p>Prepare Buildroot:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/foss-for-synopsys-dwc-arc-processors/buildroot
+mkdir<span class="w"> </span>buildroot_build
+<span class="nb">cd</span><span class="w"> </span>buildroot_build
+</pre></div>
+</div>
+<p>Create configuration file for Buildroot with name <code class="docutils literal notranslate"><span class="pre">glibc_test_defconfig</span></code>:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>BR2_arcle=y
+BR2_archs38=y
+
+#BR2_TOOLCHAIN_EXTERNAL=y
+#BR2_TOOLCHAIN_EXTERNAL_CUSTOM=y
+#BR2_TOOLCHAIN_EXTERNAL_CUSTOM_GLIBC=y
+#BR2_TOOLCHAIN_EXTERNAL_PATH=&quot;../toolchain/tools/arc-snps-linux-gnu&quot;
+#BR2_TOOLCHAIN_EXTERNAL_PATH=&quot;/tools/release-2022.09/arc-snps-linux-gnu&quot;
+#BR2_TOOLCHAIN_EXTERNAL_CUSTOM_PREFIX=&quot;$(ARCH)-linux-gnu&quot;
+#BR2_TOOLCHAIN_EXTERNAL_LOCALE=y
+#BR2_TOOLCHAIN_EXTERNAL_HAS_SSP=y
+#BR2_TOOLCHAIN_EXTERNAL_CXX=y
+#BR2_TOOLCHAIN_EXTERNAL_HEADERS_5_16=y
+#BR2_TOOLCHAIN_EXTERNAL_GDB_SERVER_COPY=y
+#BR2_TOOLCHAIN_EXTERNAL_WCHAR=y
+#BR2_TOOLCHAIN_EXTERNAL_INET_RPC=n
+
+BR2_TOOLCHAIN_USES_GLIBC=y
+BR2_ENABLE_LOCALE=y
+BR2_USE_WCHAR=y
+BR2_TOOLCHAIN_BUILDROOT_CXX=y
+BR2_TARGET_OPTIMIZATION=&quot;-O0 -g&quot;
+
+BR2_GCC_VERSION_12_X=y
+BR2_TOOLCHAIN_GLIBC_GCONV_LIBS_COPY=y
+BR2_INSTALL_LIBSTDCPP=y
+
+BR2_SYSTEM_DHCP=&quot;eth0&quot;
+BR2_LINUX_KERNEL=y
+BR2_LINUX_KERNEL_DEFCONFIG=&quot;haps_hs&quot;
+BR2_LINUX_KERNEL_CUSTOM_VERSION=y
+BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE=&quot;5.16&quot;
+BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES=&quot;../linux.fragment&quot;
+BR2_LINUX_KERNEL_VMLINUX=y
+BR2_TARGET_ROOTFS_INITRAMFS=y
+BR2_ROOTFS_OVERLAY=&quot;../overlay&quot;
+BR2_ROOTFS_USERS_TABLES=&quot;../users-table.txt&quot;
+BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_5_16=y
+BR2_PACKAGE_OPENSSH=y
+BR2_PACKAGE_NTP=y
+BR2_PACKAGE_NTP_NTPDATE=y
+BR2_PACKAGE_NFS_UTILS=y
+#BR2_PACKAGE_SSHFS=y
+BR2_PACKAGE_HAVEGED=y
+BR2_PACKAGE_MAKE=y
+
+BR2_PACKAGE_OVERRIDE_FILE=&quot;../buildroot_override&quot;
+</pre></div>
+</div>
+<p>Content of <code class="docutils literal notranslate"><span class="pre">linux.fragment</span></code> file:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>CONFIG_NFS_FS=y
+CONFIG_NAMESPACES=y
+CONFIG_UTS_NS=y
+CONFIG_IPC_NS=y
+CONFIG_USER_NS=y
+CONFIG_PID_NS=y
+CONFIG_NET_NS=y
+CONFIG_CGROUPS=y
+CONFIG_MEMCG=y
+CONFIG_IPV6=y
+</pre></div>
+</div>
+<p>Content of <code class="docutils literal notranslate"><span class="pre">buildroot_override</span></code> file:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>LINUX_OVERRIDE_SRCDIR = /home/ykolerov/workspace/task_glibc_mmu_bug/linux-upstream
+GLIBC_OVERRIDE_SRCDIR = /home/ykolerov/workspace/task_glibc_mmu_bug/glibc-upstream
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">linux-upstream</span></code> is Linux on <code class="docutils literal notranslate"><span class="pre">v5.16</span></code> tag. <code class="docutils literal notranslate"><span class="pre">glibc-upstream</span></code> is glibc on <code class="docutils literal notranslate"><span class="pre">glibc-2.36</span></code> tag.</p>
+<p>Content of <code class="docutils literal notranslate"><span class="pre">users-table.txt</span></code> file:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span># cat ./board/corp/main/users-table.txt
+# &lt;username&gt; &lt;uid&gt; &lt;group&gt; &lt;gid&gt; &lt;password&gt; &lt;home&gt;      &lt;shell&gt;  &lt;groups&gt; &lt;comment&gt;
+ykolerov     1000  ykolerov 1000    =ykolerov      /home/ykolerov     /bin/sh  -    Yuriy Kolerov
+</pre></div>
+</div>
+<p>Build Linux image:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>-C<span class="w"> </span>../buildroot<span class="w"> </span><span class="nv">O</span><span class="o">=</span><span class="sb">`</span>readlink<span class="w"> </span>-e<span class="w"> </span>.<span class="sb">`</span><span class="w"> </span>defconfig<span class="w"> </span><span class="nv">DEFCONFIG</span><span class="o">=</span><span class="sb">`</span>readlink<span class="w"> </span>-e<span class="w"> </span>./glibc_test_defconfig<span class="sb">`</span>
+make
+make<span class="w"> </span>glibc-dirclean
+make
+</pre></div>
+</div>
+<p>Run image using QEMU:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>qemu-system-arc<span class="w"> </span>-cpu<span class="w"> </span>archs<span class="w"> </span>-M<span class="w"> </span>virt<span class="w"> </span>-display<span class="w"> </span>none<span class="w"> </span>-kernel<span class="w"> </span>images/vmlinux<span class="w"> </span><span class="se">\</span>
+<span class="w">                </span>-netdev<span class="w"> </span>tap,id<span class="o">=</span>net0,ifname<span class="o">=</span>tap1,script<span class="o">=</span>no,downscript<span class="o">=</span>no<span class="w"> </span><span class="se">\</span>
+<span class="w">                </span>-device<span class="w"> </span>virtio-net-device,netdev<span class="o">=</span>net0<span class="w"> </span><span class="se">\</span>
+<span class="w">                </span>--global<span class="w"> </span>cpu.freq_hz<span class="o">=</span><span class="m">50000000</span><span class="w"> </span>-nographic
+</pre></div>
+</div>
+<p>Configure target:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>ifconfig<span class="w"> </span>eth0<span class="w"> </span><span class="m">10</span>.42.0.100
+ping<span class="w"> </span><span class="m">10</span>.42.0.1
+mkdir<span class="w"> </span>/home
+adduser<span class="w"> </span>ykolerov
+</pre></div>
+</div>
+<p>Generate SSH keys (if necessary) and copy a public key to the target:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>ssh-keygen<span class="w"> </span>-t<span class="w"> </span>rsa
+ssh-keygen<span class="w"> </span>-R<span class="w"> </span><span class="m">10</span>.42.0.100
+ssh-copy-id<span class="w"> </span>-f<span class="w"> </span>-i<span class="w"> </span>~/.ssh/id_rsa.pub<span class="w"> </span><span class="m">10</span>.42.0.100
+</pre></div>
+</div>
+<p>Get a full path to the host’s glibc directory:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>realpath<span class="w"> </span>build/glibc-*
+/home/ykolerov/workspace/task_glibc_mmu_bug/buildroot_build/build/glibc-2.36-66-ga1dc0be03c9dd850b864bd7a9c03cf8e396eb7ca
+</pre></div>
+</div>
+<p>Create this directory in target and mount :</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>/__full_path_to_glibc_source__
+
+<span class="c1"># Using NFG</span>
+mount<span class="w"> </span>-t<span class="w"> </span>nfs<span class="w"> </span><span class="m">10</span>.42.0.1:/__full_path_to_glibc_source__<span class="w"> </span>/__full_path_to_glibc_source__<span class="w"> </span>-o<span class="w"> </span>nolock
+
+<span class="c1"># Using SSHFS</span>
+sshfs<span class="w"> </span>-o<span class="w"> </span><span class="nv">idmap</span><span class="o">=</span>user,allow_other<span class="w"> </span>ykolerov@10.42.0.1:/__full_path_to_glibc_source__<span class="w"> </span>/__full_path_to_glibc_source__
+</pre></div>
+</div>
+<p>Go to the build directory of glibc and run tests:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>build/glibc-*/build
+make<span class="w"> </span>test-wrapper<span class="o">=</span><span class="s1">&#39;/__full_path_to_glibc_source__/scripts/cross-test-ssh.sh 10.42.0.100&#39;</span><span class="w"> </span>check
+</pre></div>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">🟡 glibc testsuite fails with vanilla Linux kernels</a><ul>
+<li><a class="reference internal" href="#the-problem">The Problem</a></li>
+<li><a class="reference internal" href="#configure-nfs-fedora-37">Configure NFS (Fedora 37)</a></li>
+<li><a class="reference internal" href="#configure-nfs-wsl2-with-ubuntu-22-04">Configure NFS (WSL2 with Ubuntu 22.04)</a></li>
+<li><a class="reference internal" href="#configure-tap-interface">Configure TAP interface</a></li>
+<li><a class="reference internal" href="#reproduce">Reproduce</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="index.html"
+                          title="previous chapter">Tasks</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="qemu_stack_ops.html"
+                          title="next chapter">🟡 Some stack operations are not presented in QEMU</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tasks/glibc_mmu_bug.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="qemu_stack_ops.html" title="🟡 Some stack operations are not presented in QEMU"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Tasks"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Kolerov&#39;s Notes 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Tasks</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">🟡 glibc testsuite fails with vanilla Linux kernels</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Yuriy Kolerov.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+    </div>
+  </body>
+</html>

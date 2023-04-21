@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Building from crosstool-ng &#8212; Kolerov&#39;s Notes 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Eclipse Plugin" href="eclipse.html" />
+    <link rel="prev" title="Building from arc-gnu-toolchain" href="build-dev.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="eclipse.html" title="Eclipse Plugin"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="build-dev.html" title="Building from arc-gnu-toolchain"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Kolerov&#39;s Notes 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">GNU Toolchain</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Building from <code class="docutils literal notranslate"><span class="pre">crosstool-ng</span></code></a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="building-from-crosstool-ng">
+<h1>Building from <code class="docutils literal notranslate"><span class="pre">crosstool-ng</span></code><a class="headerlink" href="#building-from-crosstool-ng" title="Permalink to this heading">¶</a></h1>
+<p>You can find a repository here: <a class="reference external" href="https://github.com/foss-for-synopsys-dwc-arc-processors/crosstool-ng">https://github.com/foss-for-synopsys-dwc-arc-processors/crosstool-ng</a>. It’s used
+for building production versions of the toolchain.</p>
+<p>Firstly, prepare your environment:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>autoconf<span class="w"> </span>help2man<span class="w"> </span>libtool<span class="w"> </span>libtool-bin<span class="w"> </span>texinfo<span class="w"> </span>byacc<span class="w"> </span>flex<span class="w"> </span>libncurses5-dev<span class="w"> </span><span class="se">\</span>
+<span class="w">                </span>zlib1g-dev<span class="w"> </span>libexpat1-dev<span class="w"> </span>texlive<span class="w"> </span>build-essential<span class="w"> </span>git<span class="w"> </span>wget<span class="w"> </span>gawk<span class="w"> </span><span class="se">\</span>
+<span class="w">                </span>bison<span class="w"> </span>xz-utils<span class="w"> </span>make<span class="w"> </span>python3<span class="w"> </span>rsync<span class="w"> </span>locales
+</pre></div>
+</div>
+<p>Retrieve Crosstool-NG and build it:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/foss-for-synopsys-dwc-arc-processors/crosstool-ng.git
+<span class="nb">cd</span><span class="w"> </span>crosstool-ng
+./bootstrap
+./configure<span class="w"> </span>--enable-local
+make
+</pre></div>
+</div>
+<p>Configure and build a toolchain:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>./ct-ng<span class="w"> </span>snps-arc-multilib-elf32
+./ct-ng<span class="w"> </span>menuconfig
+./ct-ng<span class="w"> </span>build
+</pre></div>
+</div>
+<p>After building a toolchain you can find it installed in <code class="docutils literal notranslate"><span class="pre">$HOME/x-tools</span></code> directory.
+It’s necessary to move to another place because of well-known bug (<a class="reference external" href="https://github.com/crosstool-ng/crosstool-ng/issues/1809">https://github.com/crosstool-ng/crosstool-ng/issues/1809</a>).</p>
+<p>Most interesting configurations:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">snps-arc-multilib-elf32</span></code> – Bare-metal cross-toolchain for wide range of ARCompact &amp; ARCv2 processors (ARC600, ARC700, AEC EM &amp; HS) for 64-bit Linux hosts</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">snps-arc-archs-linux-gnu</span></code> – Linux glibc cross-toolchain for ARC HS3x &amp; HS4x processors for 64-bit Linux hosts</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">snps-arc64-snps-linux-gnu</span></code> – Linux glibc cross-toolchain for for ARC HS6x processors for 64-bit Linux hosts</p></li>
+</ul>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="build-dev.html"
+                          title="previous chapter">Building from <code class="docutils literal notranslate"><span class="pre">arc-gnu-toolchain</span></code></a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="eclipse.html"
+                          title="next chapter">Eclipse Plugin</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/toolchain/build-prod.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="eclipse.html" title="Eclipse Plugin"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="build-dev.html" title="Building from arc-gnu-toolchain"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Kolerov&#39;s Notes 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >GNU Toolchain</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Building from <code class="docutils literal notranslate"><span class="pre">crosstool-ng</span></code></a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Yuriy Kolerov.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+    </div>
+  </body>
+</html>

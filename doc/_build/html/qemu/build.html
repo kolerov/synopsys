@@ -1,0 +1,164 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Building QEMU &#8212; Kolerov&#39;s Notes 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Building and running binaries" href="using.html" />
+    <link rel="prev" title="DejaGnu tests" href="verification/dejagnu.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="using.html" title="Building and running binaries"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="verification/dejagnu.html" title="DejaGnu tests"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Kolerov&#39;s Notes 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">QEMU</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Building QEMU</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="building-qemu">
+<h1>Building QEMU<a class="headerlink" href="#building-qemu" title="Permalink to this heading">¶</a></h1>
+<p>You can find a good tutorial for building QEMU in Wiki of the project: <a class="reference external" href="https://wiki.qemu.org/Hosts/Linux">https://wiki.qemu.org/Hosts/Linux</a>.</p>
+<section id="install-packages-for-ubuntu">
+<h2>Install packages for Ubuntu<a class="headerlink" href="#install-packages-for-ubuntu" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>git<span class="w"> </span>libglib2.0-dev<span class="w"> </span>libfdt-dev<span class="w"> </span>libpixman-1-dev<span class="w"> </span>zlib1g-dev<span class="w"> </span>ninja-build<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>git-email<span class="w"> </span>libaio-dev<span class="w"> </span>libbluetooth-dev<span class="w"> </span>libcapstone-dev<span class="w"> </span>libbrlapi-dev<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>libbz2-dev<span class="w"> </span>libcap-ng-dev<span class="w"> </span>libcurl4-gnutls-dev<span class="w"> </span>libgtk-3-dev<span class="w"> </span>libibverbs-dev<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>libjpeg8-dev<span class="w"> </span>libncurses5-dev<span class="w"> </span>libnuma-dev<span class="w"> </span>librbd-dev<span class="w"> </span>librdmacm-dev<span class="w"> </span>libsasl2-dev<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>libsdl2-dev<span class="w"> </span>libseccomp-dev<span class="w"> </span>libsnappy-dev<span class="w"> </span>libssh-dev<span class="w"> </span>libvde-dev<span class="w"> </span>libvdeplug-dev<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>libvte-2.91-dev<span class="w"> </span>libxen-dev<span class="w"> </span>liblzo2-dev<span class="w"> </span>valgrind<span class="w"> </span>xfslibs-dev
+</pre></div>
+</div>
+</section>
+<section id="install-packages-for-fedora">
+<h2>Install packages for Fedora<a class="headerlink" href="#install-packages-for-fedora" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>dnf<span class="w"> </span>install<span class="w"> </span>git<span class="w"> </span>glib2-devel<span class="w"> </span>libfdt-devel<span class="w"> </span>pixman-devel<span class="w"> </span>zlib-devel<span class="w"> </span>bzip2<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>ninja-build<span class="w"> </span>python3<span class="w"> </span>libaio-devel<span class="w"> </span>libcap-ng-devel<span class="w"> </span>libiscsi-devel<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>capstone-devel<span class="w"> </span>gtk3-devel<span class="w"> </span>SDL2-devel<span class="w"> </span>vte291-devel<span class="w"> </span>ncurses-devel<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>libseccomp-devel<span class="w"> </span>nettle-devel<span class="w"> </span>libattr-devel<span class="w"> </span>libjpeg-devel<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>brlapi-devel<span class="w"> </span>libgcrypt-devel<span class="w"> </span>lzo-devel<span class="w"> </span>snappy-devel<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>librdmacm-devel<span class="w"> </span>libibverbs-devel<span class="w"> </span>cyrus-sasl-devel<span class="w"> </span>libpng-devel<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>libuuid-devel<span class="w"> </span>pulseaudio-libs-devel<span class="w"> </span>curl-devel<span class="w"> </span>libssh-devel<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>systemtap-sdt-devel<span class="w"> </span>libusbx-devel
+</pre></div>
+</div>
+</section>
+<section id="build-and-install-qemu">
+<h2>Build and install QEMU<a class="headerlink" href="#build-and-install-qemu" title="Permalink to this heading">¶</a></h2>
+<p>Retrieve source code and build:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/foss-for-synopsys-dwc-arc-processors/qemu
+mkdir<span class="w"> </span>-p<span class="w"> </span>qemu/build
+<span class="nb">cd</span><span class="w"> </span>qemu/build
+../configure<span class="w"> </span>--target-list<span class="o">=</span>arc-softmmu,arc64-softmmu,arc-linux-user,arc64-linux-user<span class="w"> </span><span class="se">\</span>
+<span class="w">             </span>--enable-debug<span class="w"> </span>--enable-debug-tcg<span class="w"> </span>--prefix<span class="o">=</span>/tools/qemu
+make<span class="w"> </span>-j<span class="w"> </span><span class="k">$(</span>nproc<span class="k">)</span>
+make<span class="w"> </span>install
+</pre></div>
+</div>
+<p>Add these variables to your <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> or <code class="docutils literal notranslate"><span class="pre">.profile</span></code>:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">QEMU_HOME</span><span class="o">=</span>/tools/qemu
+<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$QEMU_HOME</span>/bin:<span class="nv">$PATH</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Building QEMU</a><ul>
+<li><a class="reference internal" href="#install-packages-for-ubuntu">Install packages for Ubuntu</a></li>
+<li><a class="reference internal" href="#install-packages-for-fedora">Install packages for Fedora</a></li>
+<li><a class="reference internal" href="#build-and-install-qemu">Build and install QEMU</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="verification/dejagnu.html"
+                          title="previous chapter">DejaGnu tests</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="using.html"
+                          title="next chapter">Building and running binaries</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/qemu/build.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="using.html" title="Building and running binaries"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="verification/dejagnu.html" title="DejaGnu tests"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Kolerov&#39;s Notes 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >QEMU</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Building QEMU</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Yuriy Kolerov.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+    </div>
+  </body>
+</html>
