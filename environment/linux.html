@@ -50,13 +50,14 @@
 <li><p><a class="reference internal" href="#bootstrap-centos-7" id="id1">Bootstrap CentOS 7</a></p></li>
 <li><p><a class="reference internal" href="#bootstrap-ubuntu-22-04" id="id2">Bootstrap Ubuntu 22.04</a></p></li>
 <li><p><a class="reference internal" href="#bootstrap-fedora-37" id="id3">Bootstrap Fedora 37</a></p></li>
-<li><p><a class="reference internal" href="#configure-profile" id="id4">Configure <code class="docutils literal notranslate"><span class="pre">.profile</span></code></a></p></li>
-<li><p><a class="reference internal" href="#configure-bashrc" id="id5">Configure <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code></a></p></li>
-<li><p><a class="reference internal" href="#setup-git" id="id6">Setup Git</a></p></li>
-<li><p><a class="reference internal" href="#install-rust" id="id7">Install Rust</a></p></li>
-<li><p><a class="reference internal" href="#build-and-install-elfutils" id="id8">Build and Install <code class="docutils literal notranslate"><span class="pre">elfutils</span></code></a></p></li>
-<li><p><a class="reference internal" href="#build-and-install-pahole" id="id9">Build and Install <code class="docutils literal notranslate"><span class="pre">pahole</span></code></a></p></li>
-<li><p><a class="reference internal" href="#build-and-install-bpftool" id="id10">Build and Install <code class="docutils literal notranslate"><span class="pre">bpftool</span></code></a></p></li>
+<li><p><a class="reference internal" href="#install-digilent-adept-2" id="id4">Install Digilent Adept 2</a></p></li>
+<li><p><a class="reference internal" href="#configure-profile" id="id5">Configure <code class="docutils literal notranslate"><span class="pre">.profile</span></code></a></p></li>
+<li><p><a class="reference internal" href="#configure-bashrc" id="id6">Configure <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code></a></p></li>
+<li><p><a class="reference internal" href="#setup-git" id="id7">Setup Git</a></p></li>
+<li><p><a class="reference internal" href="#install-rust" id="id8">Install Rust</a></p></li>
+<li><p><a class="reference internal" href="#build-and-install-elfutils" id="id9">Build and Install <code class="docutils literal notranslate"><span class="pre">elfutils</span></code></a></p></li>
+<li><p><a class="reference internal" href="#build-and-install-pahole" id="id10">Build and Install <code class="docutils literal notranslate"><span class="pre">pahole</span></code></a></p></li>
+<li><p><a class="reference internal" href="#build-and-install-bpftool" id="id11">Build and Install <code class="docutils literal notranslate"><span class="pre">bpftool</span></code></a></p></li>
 </ul>
 </nav>
 <section id="bootstrap-centos-7">
@@ -114,8 +115,25 @@ sudo<span class="w"> </span>dnf<span class="w"> </span>groupinstall<span class="
 </pre></div>
 </div>
 </section>
+<section id="install-digilent-adept-2">
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Install Digilent Adept 2</a><a class="headerlink" href="#install-digilent-adept-2" title="Permalink to this heading">¶</a></h2>
+<p>Digilent Adept 2 may be downloaded here:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://digilent.com/reference/software/adept/start">https://digilent.com/reference/software/adept/start</a></p></li>
+</ul>
+<p>Installing for Ubuntu:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>./digilent.adept.runtime_2.26.1-amd64.deb
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>./digilent.adept.utilities_2.7.1-amd64.deb
+</pre></div>
+</div>
+<p>Installing for CentOS 7:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>yum<span class="w"> </span>install<span class="w"> </span>digilent.adept.runtime-2.26.1.x86_64.rpm
+sudo<span class="w"> </span>yum<span class="w"> </span>install<span class="w"> </span>digilent.adept.utilities-2.7.1.x86_64.rpm
+</pre></div>
+</div>
+</section>
 <section id="configure-profile">
-<h2><a class="toc-backref" href="#id4" role="doc-backlink">Configure <code class="docutils literal notranslate"><span class="pre">.profile</span></code></a><a class="headerlink" href="#configure-profile" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Configure <code class="docutils literal notranslate"><span class="pre">.profile</span></code></a><a class="headerlink" href="#configure-profile" title="Permalink to this heading">¶</a></h2>
 <p>Note that Fedora uses <code class="docutils literal notranslate"><span class="pre">.bash_profile</span></code> by default for users instead of <code class="docutils literal notranslate"><span class="pre">.profile</span></code>.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Common places</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">BASE</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
@@ -149,7 +167,7 @@ sudo<span class="w"> </span>dnf<span class="w"> </span>groupinstall<span class="
 </div>
 </section>
 <section id="configure-bashrc">
-<h2><a class="toc-backref" href="#id5" role="doc-backlink">Configure <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code></a><a class="headerlink" href="#configure-bashrc" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">Configure <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code></a><a class="headerlink" href="#configure-bashrc" title="Permalink to this heading">¶</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span>clean_path<span class="o">()</span><span class="w"> </span><span class="o">{</span>
 <span class="w">    </span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PATH</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span>-e<span class="w"> </span><span class="s1">&#39;s/:\/mnt\/c.*//&#39;</span><span class="k">)</span>
 <span class="o">}</span>
@@ -174,20 +192,20 @@ sudo<span class="w"> </span>dnf<span class="w"> </span>groupinstall<span class="
 </div>
 </section>
 <section id="setup-git">
-<h2><a class="toc-backref" href="#id6" role="doc-backlink">Setup Git</a><a class="headerlink" href="#setup-git" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">Setup Git</a><a class="headerlink" href="#setup-git" title="Permalink to this heading">¶</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.name<span class="w"> </span><span class="s2">&quot;Yuriy Kolerov&quot;</span>
 git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.email<span class="w"> </span><span class="s2">&quot;ykolerov@synopsys.com&quot;</span>
 </pre></div>
 </div>
 </section>
 <section id="install-rust">
-<h2><a class="toc-backref" href="#id7" role="doc-backlink">Install Rust</a><a class="headerlink" href="#install-rust" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id8" role="doc-backlink">Install Rust</a><a class="headerlink" href="#install-rust" title="Permalink to this heading">¶</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>--proto<span class="w"> </span><span class="s1">&#39;=https&#39;</span><span class="w"> </span>--tlsv1.2<span class="w"> </span>-sSf<span class="w"> </span>https://sh.rustup.rs<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh
 </pre></div>
 </div>
 </section>
 <section id="build-and-install-elfutils">
-<span id="build-elfutils"></span><h2><a class="toc-backref" href="#id8" role="doc-backlink">Build and Install <code class="docutils literal notranslate"><span class="pre">elfutils</span></code></a><a class="headerlink" href="#build-and-install-elfutils" title="Permalink to this heading">¶</a></h2>
+<span id="build-elfutils"></span><h2><a class="toc-backref" href="#id9" role="doc-backlink">Build and Install <code class="docutils literal notranslate"><span class="pre">elfutils</span></code></a><a class="headerlink" href="#build-and-install-elfutils" title="Permalink to this heading">¶</a></h2>
 <p>Dependencies for Fedora 37:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>dnf<span class="w"> </span>install<span class="w"> </span>libmicrohttpd<span class="w"> </span>libmicrohttpd-devel<span class="w"> </span>libsq3<span class="w"> </span>libsq3-devel<span class="w"> </span>libarchive<span class="w"> </span>libarchive-devel<span class="w"> </span>gettext-devel
 </pre></div>
@@ -213,7 +231,7 @@ make<span class="w"> </span>install
 </div>
 </section>
 <section id="build-and-install-pahole">
-<span id="build-pahole"></span><h2><a class="toc-backref" href="#id9" role="doc-backlink">Build and Install <code class="docutils literal notranslate"><span class="pre">pahole</span></code></a><a class="headerlink" href="#build-and-install-pahole" title="Permalink to this heading">¶</a></h2>
+<span id="build-pahole"></span><h2><a class="toc-backref" href="#id10" role="doc-backlink">Build and Install <code class="docutils literal notranslate"><span class="pre">pahole</span></code></a><a class="headerlink" href="#build-and-install-pahole" title="Permalink to this heading">¶</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>We use here 1.23 version of Pahole because of this commit in the latest version:</p>
@@ -242,7 +260,7 @@ make<span class="w"> </span>install
 </div>
 </section>
 <section id="build-and-install-bpftool">
-<h2><a class="toc-backref" href="#id10" role="doc-backlink">Build and Install <code class="docutils literal notranslate"><span class="pre">bpftool</span></code></a><a class="headerlink" href="#build-and-install-bpftool" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id11" role="doc-backlink">Build and Install <code class="docutils literal notranslate"><span class="pre">bpftool</span></code></a><a class="headerlink" href="#build-and-install-bpftool" title="Permalink to this heading">¶</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>--recurse-submodules<span class="w"> </span>https://github.com/libbpf/bpftool.git
 <span class="nb">cd</span><span class="w"> </span>src
 make<span class="w"> </span><span class="nv">prefix</span><span class="o">=</span>/tools/bpftool<span class="w"> </span>install-bin
@@ -265,6 +283,7 @@ make<span class="w"> </span><span class="nv">prefix</span><span class="o">=</spa
 <li><a class="reference internal" href="#bootstrap-centos-7">Bootstrap CentOS 7</a></li>
 <li><a class="reference internal" href="#bootstrap-ubuntu-22-04">Bootstrap Ubuntu 22.04</a></li>
 <li><a class="reference internal" href="#bootstrap-fedora-37">Bootstrap Fedora 37</a></li>
+<li><a class="reference internal" href="#install-digilent-adept-2">Install Digilent Adept 2</a></li>
 <li><a class="reference internal" href="#configure-profile">Configure <code class="docutils literal notranslate"><span class="pre">.profile</span></code></a></li>
 <li><a class="reference internal" href="#configure-bashrc">Configure <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code></a></li>
 <li><a class="reference internal" href="#setup-git">Setup Git</a></li>

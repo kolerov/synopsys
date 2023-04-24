@@ -72,6 +72,27 @@ Install all necessary packages for work and dependencies for building a toolchai
                      libmpc-devel mpfr-devel clang clang-devel llvm llvm-devel \
                      llvm-static bpftool
 
+Install Digilent Adept 2
+------------------------
+
+Digilent Adept 2 may be downloaded here:
+
+* https://digilent.com/reference/software/adept/start
+
+Installing for Ubuntu:
+
+.. code-block:: bash
+
+    sudo apt install ./digilent.adept.runtime_2.26.1-amd64.deb
+    sudo apt install ./digilent.adept.utilities_2.7.1-amd64.deb
+
+Installing for CentOS 7:
+
+.. code-block:: bash
+
+    sudo yum install digilent.adept.runtime-2.26.1.x86_64.rpm
+    sudo yum install digilent.adept.utilities-2.7.1.x86_64.rpm
+
 Configure ``.profile``
 ----------------------
 
