@@ -28,6 +28,18 @@ Install packages for VirtualBox Guest Additions:
 
 Then you can attach a virtual CD with Guest Additions and install it manually.
 
+
+Ubuntu 18.04
+------------
+
+Install packages for VirtualBox Guest Additions:
+
+.. code-block:: bash
+
+    sudo apt install build-essential dkms linux-headers-$(uname -r)
+
+Then you can attach a virtual CD with Guest Additions and install it manually.
+
 Ubuntu 22.04
 ------------
 
