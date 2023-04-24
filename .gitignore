@@ -1,5 +1,5 @@
 .venv
-docs/_build/
+doc/_build/
 __pycache__/
 *.py[cod]
 *$py.class
