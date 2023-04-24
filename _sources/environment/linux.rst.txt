@@ -1,20 +1,28 @@
-Linux
-=====
+Configuring Linux
+=================
 
 .. contents:: Table of Contents
     :local:
     :depth: 3
 
-Bootstrap Ubuntu 22.04
-----------------------
+Bootstrap CentOS 7
+------------------
 
-Install VirtualBox Guest Additions:
+Add the user to ``wheel`` group to enabled ``sudo``:
 
 .. code-block:: bash
 
-    sudo add-apt-repository multiverse
-    sudo apt update
-    sudo apt install virtualbox-guest-utils virtualbox-guest-x11
+    usermod -aG wheel ykolerov
+
+Enable EPEL repository and update:
+
+.. code-block:: bash
+
+    sudo yum -y install epel-release
+    sudo yum -y update
+
+Bootstrap Ubuntu 22.04
+----------------------
 
 Install common packages:
 
