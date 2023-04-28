@@ -15,6 +15,24 @@ Install packages for Ubuntu
                      libsdl2-dev libseccomp-dev libsnappy-dev libssh-dev libvde-dev libvdeplug-dev \
                      libvte-2.91-dev libxen-dev liblzo2-dev valgrind xfslibs-dev
 
+Install packages for CentOS 7
+-----------------------------
+
+.. code-block:: bash
+
+    # Install latest development tools
+    sudo yum install centos-release-scl
+    sudo yum install devtoolset-9
+    scl enable devtoolset-9 bash
+
+    # Install dependencies
+    sudo yum install git glib2-devel libfdt-devel pixman-devel zlib-devel bzip2 ninja-build python3 \
+                     SDL2-devel libaio-devel libcap-ng-devel libiscsi-devel capstone-devel gtk3-devel \
+                     vte291-devel ncurses-devel libseccomp-devel nettle-devel libattr-devel libjpeg-devel \
+                     brlapi-devel libgcrypt-devel lzo-devel snappy-devel librdmacm-devel libibverbs-devel \
+                     cyrus-sasl-devel libpng-devel libuuid-devel pulseaudio-libs-devel curl-devel libssh-devel \
+                     systemtap-sdt-devel libusbx-devel
+
 Install packages for Fedora
 ---------------------------
 
