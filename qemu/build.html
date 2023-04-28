@@ -56,6 +56,23 @@
 </pre></div>
 </div>
 </section>
+<section id="install-packages-for-centos-7">
+<h2>Install packages for CentOS 7<a class="headerlink" href="#install-packages-for-centos-7" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install latest development tools</span>
+sudo<span class="w"> </span>yum<span class="w"> </span>install<span class="w"> </span>centos-release-scl
+sudo<span class="w"> </span>yum<span class="w"> </span>install<span class="w"> </span>devtoolset-9
+scl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>devtoolset-9<span class="w"> </span>bash
+
+<span class="c1"># Install dependencies</span>
+sudo<span class="w"> </span>yum<span class="w"> </span>install<span class="w"> </span>git<span class="w"> </span>glib2-devel<span class="w"> </span>libfdt-devel<span class="w"> </span>pixman-devel<span class="w"> </span>zlib-devel<span class="w"> </span>bzip2<span class="w"> </span>ninja-build<span class="w"> </span>python3<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>SDL2-devel<span class="w"> </span>libaio-devel<span class="w"> </span>libcap-ng-devel<span class="w"> </span>libiscsi-devel<span class="w"> </span>capstone-devel<span class="w"> </span>gtk3-devel<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>vte291-devel<span class="w"> </span>ncurses-devel<span class="w"> </span>libseccomp-devel<span class="w"> </span>nettle-devel<span class="w"> </span>libattr-devel<span class="w"> </span>libjpeg-devel<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>brlapi-devel<span class="w"> </span>libgcrypt-devel<span class="w"> </span>lzo-devel<span class="w"> </span>snappy-devel<span class="w"> </span>librdmacm-devel<span class="w"> </span>libibverbs-devel<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>cyrus-sasl-devel<span class="w"> </span>libpng-devel<span class="w"> </span>libuuid-devel<span class="w"> </span>pulseaudio-libs-devel<span class="w"> </span>curl-devel<span class="w"> </span>libssh-devel<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>systemtap-sdt-devel<span class="w"> </span>libusbx-devel
+</pre></div>
+</div>
+</section>
 <section id="install-packages-for-fedora">
 <h2>Install packages for Fedora<a class="headerlink" href="#install-packages-for-fedora" title="Permalink to this heading">¶</a></h2>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>dnf<span class="w"> </span>install<span class="w"> </span>git<span class="w"> </span>glib2-devel<span class="w"> </span>libfdt-devel<span class="w"> </span>pixman-devel<span class="w"> </span>zlib-devel<span class="w"> </span>bzip2<span class="w"> </span><span class="se">\</span>
@@ -101,6 +118,7 @@ make<span class="w"> </span>install
     <ul>
 <li><a class="reference internal" href="#">Building QEMU</a><ul>
 <li><a class="reference internal" href="#install-packages-for-ubuntu">Install packages for Ubuntu</a></li>
+<li><a class="reference internal" href="#install-packages-for-centos-7">Install packages for CentOS 7</a></li>
 <li><a class="reference internal" href="#install-packages-for-fedora">Install packages for Fedora</a></li>
 <li><a class="reference internal" href="#build-and-install-qemu">Build and install QEMU</a></li>
 </ul>
