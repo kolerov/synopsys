@@ -17,6 +17,11 @@ Yuriy Kolerov's documentation
    buildroot/index
 
 .. toctree::
+   :maxdepth: 2
+
+   boards/index
+
+.. toctree::
    :maxdepth: 3
 
    qemu/index

@@ -5,8 +5,17 @@ Configuring Linux
     :local:
     :depth: 3
 
-Bootstrap CentOS 7
-------------------
+All Linux Distributions
+-----------------------
+
+Grant an access to serial devices like ``/dev/ttyUSB0``:
+
+.. code-block:: bash
+
+    sudo usermod -aG dialout ykolerov
+
+Setup CentOS 7
+--------------
 
 Add the user to ``wheel`` group to enabled ``sudo``:
 
@@ -21,8 +30,16 @@ Enable EPEL repository and update:
     sudo yum -y install epel-release
     sudo yum -y update
 
-Bootstrap Ubuntu 22.04
-----------------------
+Install latest development tools and enable them:
+
+.. code-block:: bash
+
+    sudo yum install centos-release-scl
+    sudo yum install devtoolset-9 rh-git227
+    scl enable devtoolset-9 rh-git227 bash
+
+Setup Ubuntu 22.04
+------------------
 
 Install common packages:
 
@@ -39,8 +56,8 @@ Install packages for building a toolchain using Crosstool-NG or our scripts:
                      zlib1g-dev libexpat1-dev texlive build-essential git wget gawk bison \
                      xz-utils make python3 rsync locales
 
-Bootstrap Fedora 37
--------------------
+Setup Fedora 37
+---------------
 
 Install main groups:
 
